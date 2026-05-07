@@ -44,7 +44,7 @@ public class Knight extends Piece {
                     if (chessboard[toRow][toCol] == null){
                         moveSet.add(new int[]{toRow, toCol});
 
-                    } else if (chessboard[toRow][toCol].isWhite() != isWhite() && isKing()) {
+                    } else if (chessboard[toRow][toCol].isWhite() != isWhite() && chessboard[toRow][toCol].isKing()) {
                         check = true;//find the best way to implement this feature
 
                     } else if(chessboard[toRow][toCol].isWhite() != isWhite()) {

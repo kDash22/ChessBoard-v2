@@ -17,8 +17,6 @@ public abstract class Piece {
 
     protected Piece[][] chessboard;
 
-    private boolean hasMoved;
-
     public static final List<Character> COLUMN_LETTERS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
 
     //setters
@@ -33,11 +31,11 @@ public abstract class Piece {
     }
 
     public void setOriginalChessCol(char originalChessCol){
-        Character chessColObj = chessCol;
-        if (COLUMN_LETTERS.contains(chessColObj)) {
+        Character OriginalChessColObj = originalChessCol;
+        if (COLUMN_LETTERS.contains(OriginalChessColObj)) {
             this.originalChessCol = originalChessCol;
         } else {
-            throw new IllegalArgumentException("Chess column letter not valid ! : "+chessCol);
+            throw new IllegalArgumentException("Chess column letter not valid ! : "+originalChessCol);
         }
 
     }
