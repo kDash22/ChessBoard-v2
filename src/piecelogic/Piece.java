@@ -1,9 +1,10 @@
 package piecelogic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Piece {
-    List<int[]> moveSet;
+    List<int[]> moveSet = new ArrayList<>();
     protected int[][] validMoveSet;
 
     private PieceId id;

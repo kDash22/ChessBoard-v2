@@ -24,5 +24,6 @@ public class King extends Piece{
     @Override
     public void moveCheck() {
         //implement castling
+        moveSet.clear();//clear the list to remove earlier move
     }
 }

@@ -25,5 +25,6 @@ public class Pawn extends Piece{
     @Override
     public void moveCheck() {
 
+        moveSet.clear();//clear the list to remove earlier move
     }
 }

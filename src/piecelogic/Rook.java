@@ -25,6 +25,8 @@ public class Rook extends Piece{
 
     @Override
     public void moveCheck() {
+
+        moveSet.clear();//clear the list to remove earlier move
         //a Rook can move in 4 directions
         int[][] directions = {{1,0},{0,1},{-1,0},{0,-1}};
 
