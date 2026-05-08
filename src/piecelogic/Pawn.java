@@ -8,11 +8,10 @@ public class Pawn extends Piece{
     private boolean check = false;
 
     public Pawn(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic ){
+        super(chessCol,chessRow);
+
         setChessCol(chessCol);
         setChessRow(chessRow);
-
-        setOriginalChessCol(chessCol);
-        setOriginalChessRow(chessRow);
 
         if (isWhite){
             setID(PieceId.W_PAWN);
@@ -26,5 +25,11 @@ public class Pawn extends Piece{
     public void moveCheck() {
 
         moveSet.clear();//clear the list to remove earlier move
+    }
+
+    public String toString(){
+        String tag = isWhite() ? "White Pawn at " : "Black Pawn at ";
+        tag += getChessCol()+""+getChessRow();
+        return tag;
     }
 }

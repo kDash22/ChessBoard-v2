@@ -8,11 +8,10 @@ public class Rook extends Piece{
     private boolean check = false;
 
     public Rook(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
+        super(chessCol,chessRow);
+
         setChessCol(chessCol);
         setChessRow(chessRow);
-
-        setOriginalChessCol(chessCol);
-        setOriginalChessRow(chessRow);
 
         if (isWhite){
             setID(PieceId.W_ROOK);
@@ -64,4 +63,9 @@ public class Rook extends Piece{
         }
     }
 
+    public String toString(){
+        String tag = isWhite() ? "White Rook at " : "Black Rook at ";
+        tag += getChessCol()+""+getChessRow();
+        return tag;
+    }
 }

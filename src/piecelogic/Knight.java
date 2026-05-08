@@ -8,11 +8,10 @@ public class Knight extends Piece {
     private boolean check = false;
 
     public Knight(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
+        super(chessCol,chessRow);
+
         setChessCol(chessCol);
         setChessRow(chessRow);
-
-        setOriginalChessCol(chessCol);
-        setOriginalChessRow(chessRow);
 
         if (isWhite){
             setID(PieceId.W_KNIGHT);
@@ -62,5 +61,11 @@ public class Knight extends Piece {
             validMoveSet[i] = moveSet.get(i);
         }
 
+    }
+
+    public String toString(){
+        String tag = isWhite() ? "White Knight at " : "Black Knight at ";
+        tag += getChessCol()+""+getChessRow();
+        return tag;
     }
 }

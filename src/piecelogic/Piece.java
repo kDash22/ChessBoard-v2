@@ -9,8 +9,8 @@ public abstract class Piece {
 
     private PieceId id;
 
-    private char originalChessCol;
-    private int originalChessRow;
+    protected final char originalChessCol;
+    protected final int originalChessRow;
 
     private char chessCol;
     private int chessRow;
@@ -18,6 +18,11 @@ public abstract class Piece {
     protected Piece[][] chessboard;
 
     public static final List<Character> COLUMN_LETTERS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
+
+    protected Piece(char originalChessCol, int originalChessRow) {
+        this.originalChessCol = originalChessCol;
+        this.originalChessRow = originalChessRow;
+    }
 
     //setters
     public void setChessCol(char chessCol){
@@ -30,29 +35,11 @@ public abstract class Piece {
             
     }
 
-    public void setOriginalChessCol(char originalChessCol){
-        Character OriginalChessColObj = originalChessCol;
-        if (COLUMN_LETTERS.contains(OriginalChessColObj)) {
-            this.originalChessCol = originalChessCol;
-        } else {
-            throw new IllegalArgumentException("Chess column letter not valid ! : "+originalChessCol);
-        }
-
-    }
-
     public void setChessRow(int chessRow){
         if (chessRow > 0 && chessRow <= 8) {
             this.chessRow = chessRow;
         } else {
             throw new IllegalArgumentException("Chess row not valid ! : "+chessRow);
-        }
-    }
-
-    public void setOriginalChessRow(int originalChessRow){
-        if (originalChessRow > 0 && originalChessRow <= 8) {
-            this.originalChessRow = originalChessRow;
-        } else {
-            throw new IllegalArgumentException("Chess row not valid ! : "+ originalChessRow);
         }
     }
 

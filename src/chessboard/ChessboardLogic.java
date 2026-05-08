@@ -4,9 +4,9 @@ import piecelogic.*;
 
 public class ChessboardLogic {
 
-    ChessboardGui chessboardGui;
+    protected ChessboardGui chessboardGui;
 
-    Piece[][] chessboard = new Piece[8][8];//logical representation of the 8 x 8 board
+    protected Piece[][] chessboard = new Piece[8][8];//logical representation of the 8 x 8 board
 
     public ChessboardLogic(){
         System.out.println("chessboardLogic obj created ! ");

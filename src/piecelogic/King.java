@@ -7,11 +7,10 @@ public class King extends Piece{
     private boolean check = false;
 
     public King(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
+        super(chessCol,chessRow);
+
         setChessCol(chessCol);
         setChessRow(chessRow);
-
-        setOriginalChessCol(chessCol);
-        setOriginalChessRow(chessRow);
 
         if (isWhite){
             setID(PieceId.W_KING);
@@ -25,5 +24,11 @@ public class King extends Piece{
     public void moveCheck() {
         //implement castling
         moveSet.clear();//clear the list to remove earlier move
+    }
+
+    public String toString(){
+        String tag = isWhite() ? "White King at " : "Black King at ";
+        tag += getChessCol()+""+getChessRow();
+        return tag;
     }
 }

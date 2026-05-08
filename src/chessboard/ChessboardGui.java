@@ -8,11 +8,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import global.Global;
 import piecelogic.*;
 
 public class ChessboardGui extends JPanel {
@@ -20,6 +23,13 @@ public class ChessboardGui extends JPanel {
     private static final int TILE_SIZE = 80;
 
     private ChessboardLogic chessboardLogic;
+
+    private boolean selected = false;
+    private int selectedCol = -1;
+    private int selectedRow = -1;
+
+    private boolean whiteToMove = true;
+
 
     private Image wPawn, wKnight, wBishop, wRook, wQueen, wKing,
             bPawn, bKnight, bBishop, bRook, bQueen, bKing;
@@ -29,6 +39,15 @@ public class ChessboardGui extends JPanel {
         setBackground(Color.GRAY);
         loadPieces();
         System.out.println("ChessboardGui was created ! ");
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e){
+                selectPiece(e);
+
+
+            }
+        });
     }
 
     public void setChessboardLogic(ChessboardLogic chessboardLogic) {
@@ -59,7 +78,6 @@ public class ChessboardGui extends JPanel {
         } catch (Exception e) {
             throw new RuntimeException("Image loading failed", e);
         }
-        System.out.println("ChessboardGui.loadPieces method was called ! ");
     }
 
 
@@ -139,13 +157,24 @@ public class ChessboardGui extends JPanel {
             }
 
         }
+
+        //highlight a selected square
+        if (selectedRow != -1 && selectedCol != -1) {
+            Piece selected = chessboardLogic.chessboard[selectedRow][selectedCol];
+            if (selected != null) {
+                highlightSquare(g2d, selected);
+
+                g2d.setColor(new Color(148,224,224,90));
+                g2d.fillRect(selectedCol * TILE_SIZE, selectedRow * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            }
+        }
+
         g2d.translate(-offsetX, -offsetY);
         System.out.println("painting the chessboardGui");
     }
 
     public Image getPieceImage(Piece piece){
 
-        System.out.println("chessboardGui.getPieceImage was called ! ");
         return switch(piece){
             case Pawn pawn -> piece.isWhite()  ? wPawn : bPawn;
             case Knight knight -> piece.isWhite() ? wKnight : bKnight;
@@ -175,11 +204,114 @@ public class ChessboardGui extends JPanel {
         System.out.println("chessboardGui.showGame() was called ! ");
     }
 
+    public void selectPiece(MouseEvent e){
+
+        int[] square = getClickedSquare(e);
+
+        int row = square[0];
+        int col = square[1];
+
+        if (row > 7 || col > 7 || row < 0 || col < 0){
+            return;
+        }
+
+        Piece[][] refBoard = chessboardLogic.getChessboard();
+
+        //if a piece is already selected and destination is empty, chessboard.movePiece() handles the next click
+        if (selected && refBoard[row][col] == null) return;
+
+        if (refBoard[row][col] != null) {
+
+            if (refBoard[row][col].isWhite() && whiteToMove) {
+                selected = true;
+                selectedCol = col;
+                selectedRow = row;
+                repaint();
+            }
+
+            if (!refBoard[row][col].isWhite() && !whiteToMove){
+                selected = true;
+                selectedCol = col;
+                selectedRow = row;
+                repaint();
+            }
+        } else {
+            selected = false;
+            selectedCol = -1;
+            selectedRow = -1;
+            repaint();
+        }
+        System.out.println(Piece.colToChessCol(selectedCol)+""+Piece.rowToChessRow(selectedRow));
+
+
+    }
+
+    private int[] getClickedSquare(MouseEvent event){
+
+        int boardSideLength = 8 * TILE_SIZE;
+
+        int offsetX = (getWidth()- boardSideLength) /  2;
+        int offsetY = (getHeight()- boardSideLength) / 2;
+
+        int adjustedX = event.getX() - offsetX;
+        int adjustedY = event.getY() - offsetY;
+
+        if (adjustedX < 0 || adjustedY < 0 || adjustedX >= boardSideLength || adjustedY >= boardSideLength) {
+            return new int[]{-1, -1};
+        }
+
+        // This prevents misclassification of out-of-bounds clicks as tile (0,0).
+        int screenCol = Math.floorDiv(adjustedX, TILE_SIZE);
+        int screenRow = Math.floorDiv(adjustedY, TILE_SIZE);
+
+        //returns the Piece[][] board index
+        return new int[]{screenRow,screenCol};
+
+    }
+
+    public void highlightSquare(Graphics2D g2d, Piece piece){
+
+        if (piece == null) return;
+
+        //check on this
+        piece.moveCheck();
+        int[][] moveSet = piece.getValidMoveSet();
+
+        for (int i = 0; i < moveSet.length; i++) {
+                int row = moveSet[i][0];
+                int col = moveSet[i][1];
+
+                // bounds check
+                if (row < 0 || row >= 8 || col < 0 || col >= 8)
+                    continue;
+                if (chessboardLogic.getChessboard()[row][col] != null) {
+                    g2d.setColor(new Color(255, 0, 0, 60));
+                } else {
+                    g2d.setColor(new Color(0, 255, 0, 60));
+                }
+
+                g2d.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
+    }
+
     public static void main(String[] args){
 
         ChessboardLogic chessboardLogic = new ChessboardLogic();
         chessboardLogic.newGame();
         chessboardLogic.getChessboardGui().showGame();
+        System.out.println();
+        System.out.println();
+
+        for (int row = 0; row < 8; row++){
+            for (int col = 0; col < 8; col++){
+                Piece piece = chessboardLogic.chessboard[row][col];
+                if (piece != null){
+                    piece.moveCheck();
+                    System.out.println(piece);
+                    Global.printValidMoveSet(piece.getValidMoveSet());
+                }
+            }
+        }
         
     }
 
