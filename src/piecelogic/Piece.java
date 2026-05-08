@@ -22,9 +22,22 @@ public abstract class Piece {
     public static final List<Character> COLUMN_LETTERS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
 
     protected Piece(char originalChessCol, int originalChessRow, ChessboardLogic chessboardLogic) {
+
+        Character chessColObj = originalChessCol;
+        if (COLUMN_LETTERS.contains(chessColObj)) {
+            this.originalChessCol = originalChessCol;
+        } else {
+            throw new IllegalArgumentException("Chess column letter not valid ! : "+originalChessCol);
+        }
+
+        if (originalChessRow > 0 && originalChessRow <= 8) {
+            this.originalChessRow = originalChessRow;
+        } else {
+            throw new IllegalArgumentException("Chess row not valid ! : "+originalChessRow);
+        }
+
         this.chessboardLogic = chessboardLogic;
-        this.originalChessCol = originalChessCol;
-        this.originalChessRow = originalChessRow;
+
     }
 
     //setters

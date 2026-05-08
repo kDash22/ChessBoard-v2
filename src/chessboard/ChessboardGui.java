@@ -167,7 +167,6 @@ public class ChessboardGui extends JPanel {
         }
 
         g2d.translate(-offsetX, -offsetY);
-        System.out.println("painting the chessboardGui");
     }
 
     public Image getPieceImage(Piece piece){
@@ -223,6 +222,7 @@ public class ChessboardGui extends JPanel {
                 selected = true;
                 selectedCol = col;
                 selectedRow = row;
+                System.out.println(Piece.colToChessCol(selectedCol)+""+Piece.rowToChessRow(selectedRow));
                 repaint();
             }
 
@@ -230,6 +230,7 @@ public class ChessboardGui extends JPanel {
                 selected = true;
                 selectedCol = col;
                 selectedRow = row;
+                System.out.println(Piece.colToChessCol(selectedCol)+""+Piece.rowToChessRow(selectedRow));
                 repaint();
             }
         } else {
@@ -238,7 +239,7 @@ public class ChessboardGui extends JPanel {
             selectedRow = -1;
             repaint();
         }
-        System.out.println(Piece.colToChessCol(selectedCol)+""+Piece.rowToChessRow(selectedRow));
+
 
 
     }
