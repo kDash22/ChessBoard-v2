@@ -1,5 +1,7 @@
 package piecelogic;
 
+import chessboard.ChessboardLogic;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,11 +17,12 @@ public abstract class Piece {
     private char chessCol;
     private int chessRow;
 
-    protected Piece[][] chessboard;
+    protected ChessboardLogic chessboardLogic;
 
     public static final List<Character> COLUMN_LETTERS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
 
-    protected Piece(char originalChessCol, int originalChessRow) {
+    protected Piece(char originalChessCol, int originalChessRow, ChessboardLogic chessboardLogic) {
+        this.chessboardLogic = chessboardLogic;
         this.originalChessCol = originalChessCol;
         this.originalChessRow = originalChessRow;
     }
@@ -45,10 +48,6 @@ public abstract class Piece {
 
     public void setID(PieceId id){
         this.id = id;
-    }
-
-    public void setChessboard(Piece[][] chessboard) {
-        this.chessboard = chessboard;
     }
 
     //getters
@@ -78,10 +77,6 @@ public abstract class Piece {
 
     public PieceId getId(){
         return id;
-    }
-
-    public Piece[][] getChessboard() {
-        return chessboard;
     }
 
     // a method used to convert column letter into int to be used in arrays

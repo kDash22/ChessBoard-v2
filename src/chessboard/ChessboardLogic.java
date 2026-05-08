@@ -6,11 +6,14 @@ public class ChessboardLogic {
 
     protected ChessboardGui chessboardGui;
 
+    protected boolean whiteToMove = false;
+
     protected Piece[][] chessboard = new Piece[8][8];//logical representation of the 8 x 8 board
 
     public ChessboardLogic(){
         System.out.println("chessboardLogic obj created ! ");
         chessboardGui = new ChessboardGui();
+        whiteToMove = true; //check this out later
     }
     //setters
     public void setChessboard(Piece[][] board){
@@ -20,6 +23,10 @@ public class ChessboardLogic {
         this.chessboard = board;
     }
 
+    public void setWhiteToMove(boolean whiteToMove) {
+        this.whiteToMove = whiteToMove;
+    }
+
     //getters
     public ChessboardGui getChessboardGui(){
         return chessboardGui;
@@ -27,6 +34,10 @@ public class ChessboardLogic {
 
     public Piece[][] getChessboard() {
         return chessboard;
+    }
+
+    public boolean isWhiteToMove(){
+        return whiteToMove;
     }
 
     public void insertPieceToBoard(Piece piece){
@@ -85,4 +96,7 @@ public class ChessboardLogic {
         System.out.println("Chessboard.newGame() was called ! ");
     }
 
+    public static boolean isSquareWithinBounds(int row, int col){
+        return row < 8 && col < 8 && row >= 0 && col >= 0;
+    }
 }

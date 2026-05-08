@@ -28,9 +28,6 @@ public class ChessboardGui extends JPanel {
     private int selectedCol = -1;
     private int selectedRow = -1;
 
-    private boolean whiteToMove = true;
-
-
     private Image wPawn, wKnight, wBishop, wRook, wQueen, wKing,
             bPawn, bKnight, bBishop, bRook, bQueen, bKing;
 
@@ -222,14 +219,14 @@ public class ChessboardGui extends JPanel {
 
         if (refBoard[row][col] != null) {
 
-            if (refBoard[row][col].isWhite() && whiteToMove) {
+            if (refBoard[row][col].isWhite() && chessboardLogic.isWhiteToMove()) {
                 selected = true;
                 selectedCol = col;
                 selectedRow = row;
                 repaint();
             }
 
-            if (!refBoard[row][col].isWhite() && !whiteToMove){
+            if (!refBoard[row][col].isWhite() && !chessboardLogic.isWhiteToMove()){
                 selected = true;
                 selectedCol = col;
                 selectedRow = row;
@@ -276,21 +273,22 @@ public class ChessboardGui extends JPanel {
         //check on this
         piece.moveCheck();
         int[][] moveSet = piece.getValidMoveSet();
+        Global.printValidMoveSet(moveSet);
 
-        for (int i = 0; i < moveSet.length; i++) {
-                int row = moveSet[i][0];
-                int col = moveSet[i][1];
+        for (int[] move : moveSet) {
+            int row = move[0];
+            int col = move[1];
 
-                // bounds check
-                if (row < 0 || row >= 8 || col < 0 || col >= 8)
-                    continue;
-                if (chessboardLogic.getChessboard()[row][col] != null) {
-                    g2d.setColor(new Color(255, 0, 0, 60));
-                } else {
-                    g2d.setColor(new Color(0, 255, 0, 60));
-                }
+            // bounds check
+            if (row < 0 || row >= 8 || col < 0 || col >= 8)
+                continue;
+            if (chessboardLogic.getChessboard()[row][col] != null) {
+                g2d.setColor(new Color(255, 0, 0, 60));
+            } else {
+                g2d.setColor(new Color(0, 255, 0, 60));
+            }
 
-                g2d.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            g2d.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
     }
 

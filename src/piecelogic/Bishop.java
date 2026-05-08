@@ -9,7 +9,7 @@ public class Bishop extends Piece{
     private boolean check = false;
 
     public Bishop(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
-        super(chessCol,chessRow);
+        super(chessCol,chessRow,chessboardLogic);
 
         setChessCol(chessCol);
         setChessRow(chessRow);
@@ -19,13 +19,17 @@ public class Bishop extends Piece{
         } else {
             setID(PieceId.B_BISHOP);
         }
-
-        setChessboard(chessboardLogic.getChessboard());
         chessboardLogic.insertPieceToBoard(this);
     }
 
     @Override
     public void moveCheck() {
+
+        if (isWhite() != chessboardLogic.isWhiteToMove()){
+            return;
+        }
+
+        Piece[][] refBoard = chessboardLogic.getChessboard();
 
         moveSet.clear();//clear the list to remove earlier move
         //a bishop can move in 4 directions
@@ -38,15 +42,15 @@ public class Bishop extends Piece{
             int toRow = row + direction[0];
             int toCol = col + direction[1];
 
-            while(toRow < 8 && toCol < 8 && toRow >=0 && toCol >= 0){
+            while(ChessboardLogic.isSquareWithinBounds(toRow,toCol)){
 
-                if (chessboard[toRow][toCol] == null){
+                if (refBoard[toRow][toCol] == null){
                     moveSet.add(new int[]{toRow, toCol});
 
-                } else if (chessboard[toRow][toCol].isWhite() != isWhite() && chessboard[toRow][toCol].isKing()) {
+                } else if (refBoard[toRow][toCol].isWhite() != isWhite() && refBoard[toRow][toCol].isKing()) {
                     check = true;//find the best way to implement this feature
                     break;
-                } else if(chessboard[toRow][toCol].isWhite() != isWhite()) {
+                } else if(refBoard[toRow][toCol].isWhite() != isWhite()) {
                     moveSet.add(new int[]{toRow, toCol});
                     break;
                 } else {

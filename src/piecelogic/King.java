@@ -7,7 +7,7 @@ public class King extends Piece{
     private boolean check = false;
 
     public King(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
-        super(chessCol,chessRow);
+        super(chessCol,chessRow,chessboardLogic);
 
         setChessCol(chessCol);
         setChessRow(chessRow);
@@ -17,11 +17,15 @@ public class King extends Piece{
         } else {
             setID(PieceId.B_KING);
         }
-        setChessboard(chessboardLogic.getChessboard());
         chessboardLogic.insertPieceToBoard(this);    }
 
     @Override
     public void moveCheck() {
+
+        if (isWhite() != chessboardLogic.isWhiteToMove()){
+            return;
+        }
+
         //implement castling
         moveSet.clear();//clear the list to remove earlier move
     }
