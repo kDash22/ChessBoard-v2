@@ -21,13 +21,73 @@ public class King extends Piece{
 
     @Override
     public void moveCheck() {
+        moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
+            validMoveSet = new int[0][2];
             return;
         }
 
+        int row = chessRowToIndex(getChessRow());
+        int col = chessColToIndex(getChessCol());
 
-        moveSet.clear();//clear the list to remove earlier move
+        Piece[][] refBoard = chessboardLogic.getChessboard();
+
+        //a king has 8 general moves
+        int[][] directions = {{1,0},{1,1},{0,1},{-1,1},{-1,0},{-1,-1},{0,-1},{1,-1}};
+
+        for (int[] direction : directions){
+
+            int toRow = row + direction[0];
+            int toCol = col + direction[1];
+
+            if (ChessboardLogic.isSquareWithinBounds(toRow,toCol)){
+                if (refBoard[toRow][toCol] == null) {
+                    // Empty square
+                    moveSet.add(new int[]{toRow,toCol});
+                } else if (refBoard[toRow][toCol].isWhite() != isWhite()) {
+                    // Enemy piece
+                    moveSet.add(new int[]{toRow,toCol});
+                }
+            }
+
+        }
+
+
+        // King Proximity Rule
+        // Check if adjacent squares contain an enemy King
+        for (int i = moveSet.size() - 1; i >= 0; i--){
+
+            int[] move = moveSet.get(i);
+            boolean remove = false;
+
+            for (int dr = -1; dr <= 1 && !remove; dr++) {
+                for (int dc = -1; dc <= 1; dc++) {
+
+                    //skip the destination square
+                    if (dr == 0 && dc == 0) {
+                        continue;
+                    }
+
+                    int adjRow = move[0] + dr;
+                    int adjCol = move[1] + dc;
+
+                    if (ChessboardLogic.isSquareWithinBounds(adjRow, adjCol)) {
+                        Piece adjPiece = refBoard[adjRow][adjCol];
+                        if (adjPiece instanceof King && adjPiece.isWhite() != isWhite()) {
+                            remove = true;
+                            break;
+                        }
+
+                    }
+                }
+
+            }
+            if (remove) moveSet.remove(i);
+        }
+
+
+
 
         //implement castling
 

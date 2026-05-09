@@ -297,9 +297,11 @@ public class ChessboardGui extends JPanel {
 
         ChessboardLogic chessboardLogic = new ChessboardLogic();
         chessboardLogic.newGame();
+        //chessboardLogic.customBoard();
         chessboardLogic.getChessboardGui().showGame();
         System.out.println();
         System.out.println();
+
 
         for (int row = 0; row < 8; row++){
             for (int col = 0; col < 8; col++){
@@ -311,6 +313,8 @@ public class ChessboardGui extends JPanel {
                 }
             }
         }
+
+
         
     }
 
