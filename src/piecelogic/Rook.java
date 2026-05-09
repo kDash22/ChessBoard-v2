@@ -8,23 +8,27 @@ public class Rook extends Piece{
     private boolean check = false;
 
     public Rook(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
+        super(chessCol,chessRow,chessboardLogic);
+
         setChessCol(chessCol);
         setChessRow(chessRow);
-
-        setOriginalChessCol(chessCol);
-        setOriginalChessRow(chessRow);
 
         if (isWhite){
             setID(PieceId.W_ROOK);
         } else {
             setID(PieceId.B_ROOK);
         }
-        setChessboard(chessboardLogic.getChessboard());
         chessboardLogic.insertPieceToBoard(this);
     }
 
     @Override
     public void moveCheck() {
+
+        if (isWhite() != chessboardLogic.isWhiteToMove()){
+            return;
+        }
+
+        Piece[][] refBoard = chessboardLogic.getChessboard();
 
         moveSet.clear();//clear the list to remove earlier move
         //a Rook can move in 4 directions
@@ -37,15 +41,15 @@ public class Rook extends Piece{
             int toRow = row + direction[0];
             int toCol = col + direction[1];
 
-            while(toRow < 8 && toCol < 8 && toRow >=0 && toCol >= 0){
+            while( ChessboardLogic.isSquareWithinBounds(toRow,toCol) ){
 
-                if (chessboard[toRow][toCol] == null){
+                if (refBoard[toRow][toCol] == null){
                     moveSet.add(new int[]{toRow, toCol});
 
-                } else if (chessboard[toRow][toCol].isWhite() != isWhite() && chessboard[toRow][toCol].isKing()) {
+                } else if (refBoard[toRow][toCol].isWhite() != isWhite() && refBoard[toRow][toCol].isKing()) {
                     check = true;//find the best way to implement this feature
                     break;
-                } else if(chessboard[toRow][toCol].isWhite() != isWhite()) {
+                } else if(refBoard[toRow][toCol].isWhite() != isWhite()) {
                     moveSet.add(new int[]{toRow, toCol});
                     break;
                 } else {
@@ -64,4 +68,9 @@ public class Rook extends Piece{
         }
     }
 
+    public String toString(){
+        String tag = isWhite() ? "White Rook at " : "Black Rook at ";
+        tag += getChessCol()+""+getChessRow();
+        return tag;
+    }
 }

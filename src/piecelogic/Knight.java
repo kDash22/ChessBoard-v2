@@ -8,25 +8,28 @@ public class Knight extends Piece {
     private boolean check = false;
 
     public Knight(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
+        super(chessCol,chessRow,chessboardLogic);
+
         setChessCol(chessCol);
         setChessRow(chessRow);
-
-        setOriginalChessCol(chessCol);
-        setOriginalChessRow(chessRow);
 
         if (isWhite){
             setID(PieceId.W_KNIGHT);
         } else {
             setID(PieceId.B_KNIGHT);
         }
-
-        setChessboard(chessboardLogic.getChessboard());
         chessboardLogic.insertPieceToBoard(this);
 
     }
 
     @Override
     public void moveCheck() {
+
+        if (isWhite() != chessboardLogic.isWhiteToMove()){
+            return;
+        }
+
+        Piece[][] refboard = chessboardLogic.getChessboard();
 
         moveSet.clear();//clear the list to remove earlier moves
         //a knight has 8 possible moves or directions
@@ -39,15 +42,15 @@ public class Knight extends Piece {
                 int toRow = row + directions[i][0];
                 int toCol = col + directions[i][1];
 
-                if(toRow < 8 && toCol < 8 && toRow >= 0 && toCol >= 0 ){
+                if( ChessboardLogic.isSquareWithinBounds(toRow,toCol) ){
 
-                    if (chessboard[toRow][toCol] == null){
+                    if (refboard[toRow][toCol] == null){
                         moveSet.add(new int[]{toRow, toCol});
 
-                    } else if (chessboard[toRow][toCol].isWhite() != isWhite() && chessboard[toRow][toCol].isKing()) {
+                    } else if (refboard[toRow][toCol].isWhite() != isWhite() && refboard[toRow][toCol].isKing()) {
                         check = true;//find the best way to implement this feature
 
-                    } else if(chessboard[toRow][toCol].isWhite() != isWhite()) {
+                    } else if(refboard[toRow][toCol].isWhite() != isWhite()) {
                         moveSet.add(new int[]{toRow, toCol});
 
                     }
@@ -62,5 +65,11 @@ public class Knight extends Piece {
             validMoveSet[i] = moveSet.get(i);
         }
 
+    }
+
+    public String toString(){
+        String tag = isWhite() ? "White Knight at " : "Black Knight at ";
+        tag += getChessCol()+""+getChessRow();
+        return tag;
     }
 }

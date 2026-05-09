@@ -1,5 +1,7 @@
 package piecelogic;
 
+import chessboard.ChessboardLogic;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,15 +11,34 @@ public abstract class Piece {
 
     private PieceId id;
 
-    private char originalChessCol;
-    private int originalChessRow;
+    protected final char originalChessCol;
+    protected final int originalChessRow;
 
     private char chessCol;
     private int chessRow;
 
-    protected Piece[][] chessboard;
+    protected ChessboardLogic chessboardLogic;
 
     public static final List<Character> COLUMN_LETTERS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
+
+    protected Piece(char originalChessCol, int originalChessRow, ChessboardLogic chessboardLogic) {
+
+        Character chessColObj = originalChessCol;
+        if (COLUMN_LETTERS.contains(chessColObj)) {
+            this.originalChessCol = originalChessCol;
+        } else {
+            throw new IllegalArgumentException("Chess column letter not valid ! : "+originalChessCol);
+        }
+
+        if (originalChessRow > 0 && originalChessRow <= 8) {
+            this.originalChessRow = originalChessRow;
+        } else {
+            throw new IllegalArgumentException("Chess row not valid ! : "+originalChessRow);
+        }
+
+        this.chessboardLogic = chessboardLogic;
+
+    }
 
     //setters
     public void setChessCol(char chessCol){
@@ -30,16 +51,6 @@ public abstract class Piece {
             
     }
 
-    public void setOriginalChessCol(char originalChessCol){
-        Character OriginalChessColObj = originalChessCol;
-        if (COLUMN_LETTERS.contains(OriginalChessColObj)) {
-            this.originalChessCol = originalChessCol;
-        } else {
-            throw new IllegalArgumentException("Chess column letter not valid ! : "+originalChessCol);
-        }
-
-    }
-
     public void setChessRow(int chessRow){
         if (chessRow > 0 && chessRow <= 8) {
             this.chessRow = chessRow;
@@ -48,20 +59,8 @@ public abstract class Piece {
         }
     }
 
-    public void setOriginalChessRow(int originalChessRow){
-        if (originalChessRow > 0 && originalChessRow <= 8) {
-            this.originalChessRow = originalChessRow;
-        } else {
-            throw new IllegalArgumentException("Chess row not valid ! : "+ originalChessRow);
-        }
-    }
-
     public void setID(PieceId id){
         this.id = id;
-    }
-
-    public void setChessboard(Piece[][] chessboard) {
-        this.chessboard = chessboard;
     }
 
     //getters
@@ -91,10 +90,6 @@ public abstract class Piece {
 
     public PieceId getId(){
         return id;
-    }
-
-    public Piece[][] getChessboard() {
-        return chessboard;
     }
 
     // a method used to convert column letter into int to be used in arrays
