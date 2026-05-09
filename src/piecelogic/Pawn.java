@@ -51,13 +51,25 @@ public class Pawn extends Piece{
 
                 if (ChessboardLogic.isSquareWithinBounds( tempMoves[1][0],tempMoves[1][1] )){
 
-                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null) //2 square check
+                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !hasMoved()) //2 square check
                         moveSet.add(tempMoves[1]);
                 }
             }
         }
 
         //capturing logic to the right (observer's  right)
+        if ( ChessboardLogic.isSquareWithinBounds( tempMoves[2][0],tempMoves[2][1] ) ){
+            int toRow = tempMoves[2][0];
+            int toCol = tempMoves[2][1];
+            if (       refBoard[toRow][toCol] != null
+                    && refBoard[toRow][toCol].isWhite() != isWhite()
+                    && !refBoard[toRow][toCol].isKing())
+            {
+                moveSet.add(tempMoves[2]);
+            }
+        }
+
+        //capturing logic to the left (observer's left)
         if ( ChessboardLogic.isSquareWithinBounds( tempMoves[3][0],tempMoves[3][1] ) ){
             int toRow = tempMoves[3][0];
             int toCol = tempMoves[3][1];
@@ -66,18 +78,6 @@ public class Pawn extends Piece{
                     && !refBoard[toRow][toCol].isKing())
             {
                 moveSet.add(tempMoves[3]);
-            }
-        }
-
-        //capturing logic to the left (observer's left)
-        if ( ChessboardLogic.isSquareWithinBounds( tempMoves[4][0],tempMoves[4][1] ) ){
-            int toRow = tempMoves[4][0];
-            int toCol = tempMoves[4][1];
-            if (       refBoard[toRow][toCol] != null
-                    && refBoard[toRow][toCol].isWhite() != isWhite()
-                    && !refBoard[toRow][toCol].isKing())
-            {
-                moveSet.add(tempMoves[4]);
             }
         }
 

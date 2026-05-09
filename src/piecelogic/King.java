@@ -26,8 +26,17 @@ public class King extends Piece{
             return;
         }
 
-        //implement castling
+
         moveSet.clear();//clear the list to remove earlier move
+
+        //implement castling
+
+        int validMoveCount = moveSet.size();
+        validMoveSet = new int[validMoveCount][2];
+
+        for (int i = 0; i < validMoveCount; i++){
+            validMoveSet[i] = moveSet.get(i);
+        }
     }
 
     public String toString(){
