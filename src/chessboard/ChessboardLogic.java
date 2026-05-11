@@ -45,7 +45,7 @@ public class ChessboardLogic {
         int row = Piece.chessRowToIndex(piece.getChessRow());
 
         this.chessboard[row][col] = piece;
-        System.out.println("piece inserted into the board ! ");
+        //System.out.println("piece inserted into the board ! ");
     }
 
     public void newGame(){
@@ -94,6 +94,16 @@ public class ChessboardLogic {
         Pawn bP8 = new Pawn('h',7,false,this);
 
         System.out.println("Chessboard.newGame() was called ! ");
+    }
+
+    public void customBoard(){
+        chessboardGui.setChessboardLogic(this);
+
+        Piece[][] emptyBoard = new Piece[8][8];
+        setChessboard(emptyBoard);
+
+        King wK   = new King('e',4,true,this);
+
     }
 
     public static boolean isSquareWithinBounds(int row, int col){

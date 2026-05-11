@@ -22,14 +22,15 @@ public class Queen extends Piece{
 
     @Override
     public void moveCheck() {
+        moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
+            validMoveSet = new int[0][2];
             return;
         }
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
-        moveSet.clear();//clear the list to remove earlier move
         //a Queen can move in 8 directions
         int[][] directions = {{1,0},{1,1},{0,1},{-1,1},{-1,0},{-1,-1},{0,-1},{1,-1}};
 

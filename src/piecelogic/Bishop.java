@@ -24,14 +24,15 @@ public class Bishop extends Piece{
 
     @Override
     public void moveCheck() {
+        moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
+            validMoveSet = new int[0][2];
             return;
         }
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
-        moveSet.clear();//clear the list to remove earlier move
         //a bishop can move in 4 directions
         int[][] directions = {{1,1},{-1,1},{-1,-1},{1,-1}};
 
