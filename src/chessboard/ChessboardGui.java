@@ -318,7 +318,4 @@ public class ChessboardGui extends JPanel {
         
     }
 
-
-
-
 }
