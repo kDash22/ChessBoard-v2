@@ -6,6 +6,7 @@ public class Pawn extends Piece{
 
     public static final int PIECE_VALUE = 1;
     private boolean check = false;
+    private boolean enPassantVulnerable = false;
 
     public Pawn(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic ){
         super(chessCol,chessRow,chessboardLogic);

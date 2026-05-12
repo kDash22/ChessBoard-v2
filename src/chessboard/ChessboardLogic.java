@@ -109,4 +109,25 @@ public class ChessboardLogic {
     public static boolean isSquareWithinBounds(int row, int col){
         return row < 8 && col < 8 && row >= 0 && col >= 0;
     }
+
+    public void movePiece(int selectedRow, int selectedCol, int selectedToRow, int selectedToCol){
+
+        Piece movingPiece = chessboard[selectedRow][selectedCol];
+
+        int[][] validMoveSet = movingPiece.getValidMoveSet();
+
+        for(int i = 0; i < validMoveSet.length; i++){
+
+            int r = validMoveSet[i][0];
+            int c = validMoveSet[i][1];
+
+            if (r == selectedToRow && c== selectedToCol){
+
+                chessboard[selectedToRow][selectedToCol] = movingPiece;
+                chessboard[selectedRow][selectedCol] = null;
+                movingPiece.updateCoords(selectedToRow,selectedToCol);
+            }
+
+        }
+    }
 }

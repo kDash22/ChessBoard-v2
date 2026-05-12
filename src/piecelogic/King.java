@@ -85,10 +85,6 @@ public class King extends Piece{
             }
             if (remove) moveSet.remove(i);
         }
-
-
-
-
         //implement castling
 
         int validMoveCount = moveSet.size();

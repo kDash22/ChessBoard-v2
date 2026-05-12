@@ -24,7 +24,7 @@ public class ChessboardGui extends JPanel {
 
     private ChessboardLogic chessboardLogic;
 
-    private boolean selected = false;
+    private boolean pieceSelected = false;
     private int selectedCol = -1;
     private int selectedRow = -1;
 
@@ -40,11 +40,21 @@ public class ChessboardGui extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e){
-                selectPiece(e);
+                if (pieceSelected){
+                    movePiece(e);
+                } else {
+                    selectPiece(e);
+                }
+
+
 
 
             }
         });
+    }
+
+    public boolean isPieceSelected(){
+        return pieceSelected;
     }
 
     public void setChessboardLogic(ChessboardLogic chessboardLogic) {
@@ -155,7 +165,7 @@ public class ChessboardGui extends JPanel {
 
         }
 
-        //highlight a selected square
+        //highlight a isPieceSelected square
         if (selectedRow != -1 && selectedCol != -1) {
             Piece selected = chessboardLogic.chessboard[selectedRow][selectedCol];
             if (selected != null) {
@@ -200,9 +210,9 @@ public class ChessboardGui extends JPanel {
         System.out.println("chessboardGui.showGame() was called ! ");
     }
 
-    public void selectPiece(MouseEvent e){
+    public void selectPiece(MouseEvent event){
 
-        int[] square = getClickedSquare(e);
+        int[] square = getClickedSquare(event);
 
         int row = square[0];
         int col = square[1];
@@ -214,34 +224,54 @@ public class ChessboardGui extends JPanel {
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
         //if a piece is already selected and destination is empty, chessboard.movePiece() handles the next click
-        if (selected && refBoard[row][col] == null) return;
+        /*if (pieceSelected) {
+            Piece movingPiece = refBoard[selectedRow][selectedCol] ;
+            if ()
+            return;
+        }
+        
+         */
 
         if (refBoard[row][col] != null) {
 
             if (refBoard[row][col].isWhite() && chessboardLogic.isWhiteToMove()) {
-                selected = true;
+                pieceSelected = true;
                 selectedCol = col;
                 selectedRow = row;
-                System.out.println(Piece.colToChessCol(selectedCol)+""+Piece.rowToChessRow(selectedRow));
+
                 repaint();
             }
 
             if (!refBoard[row][col].isWhite() && !chessboardLogic.isWhiteToMove()){
-                selected = true;
+                pieceSelected = true;
                 selectedCol = col;
                 selectedRow = row;
-                System.out.println(Piece.colToChessCol(selectedCol)+""+Piece.rowToChessRow(selectedRow));
                 repaint();
             }
         } else {
-            selected = false;
+            pieceSelected = false;
             selectedCol = -1;
             selectedRow = -1;
             repaint();
         }
 
 
+    }
 
+    private void movePiece(MouseEvent event){
+
+        int[] destinationSquare = getClickedSquare(event);
+
+        int selectedToRow = destinationSquare[0];
+        int selectedToCol = destinationSquare[1];
+
+        chessboardLogic.movePiece(selectedRow,selectedCol,selectedToRow,selectedToCol);
+
+        pieceSelected = false;
+        selectedCol = selectedRow = -1;
+
+
+        repaint();
     }
 
     private int[] getClickedSquare(MouseEvent event){

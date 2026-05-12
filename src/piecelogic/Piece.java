@@ -132,9 +132,9 @@ public abstract class Piece {
                 getId() == PieceId.B_KING;
     }
 
-    public void updateCoords(char newChessCol, int newChessRow){
-        setChessRow(newChessRow);
-        setChessCol(newChessCol);
+    public void updateCoords(int row, int col){
+        setChessRow(rowToChessRow(row));
+        setChessCol(colToChessCol(col));
 
     }
 
