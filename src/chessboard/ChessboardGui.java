@@ -40,12 +40,14 @@ public class ChessboardGui extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e){
+                /*
                 if (pieceSelected){
                     movePiece(e);
                 } else {
                     selectPiece(e);
                 }
-
+                 */
+                selectPiece(e);
 
 
 
@@ -223,14 +225,27 @@ public class ChessboardGui extends JPanel {
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
-        //if a piece is already selected and destination is empty, chessboard.movePiece() handles the next click
-        /*if (pieceSelected) {
+        //if a piece is already selected
+        if (pieceSelected) {
+
             Piece movingPiece = refBoard[selectedRow][selectedCol] ;
-            if ()
+            int[][] moveSet = movingPiece.getValidMoveSet();
+
+            for (int i = 0; i < moveSet.length; i++){
+
+                if (row == moveSet[i][0] && col == moveSet[i][1]){
+
+                    chessboardLogic.movePiece(selectedRow,selectedCol,row,col);
+                    break;
+                }
+            }
+
+            pieceSelected = false;
+            selectedCol = selectedRow = -1;
+            repaint();
+
             return;
         }
-        
-         */
 
         if (refBoard[row][col] != null) {
 
@@ -249,29 +264,11 @@ public class ChessboardGui extends JPanel {
                 repaint();
             }
         } else {
-            pieceSelected = false;
-            selectedCol = -1;
-            selectedRow = -1;
+            selectedCol = selectedRow = -1;
             repaint();
         }
 
 
-    }
-
-    private void movePiece(MouseEvent event){
-
-        int[] destinationSquare = getClickedSquare(event);
-
-        int selectedToRow = destinationSquare[0];
-        int selectedToCol = destinationSquare[1];
-
-        chessboardLogic.movePiece(selectedRow,selectedCol,selectedToRow,selectedToCol);
-
-        pieceSelected = false;
-        selectedCol = selectedRow = -1;
-
-
-        repaint();
     }
 
     private int[] getClickedSquare(MouseEvent event){
