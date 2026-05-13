@@ -24,7 +24,7 @@ public class ChessboardGui extends JPanel {
 
     private ChessboardLogic chessboardLogic;
 
-    private boolean selected = false;
+    private boolean pieceSelected = false;
     private int selectedCol = -1;
     private int selectedRow = -1;
 
@@ -40,11 +40,17 @@ public class ChessboardGui extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e){
+
                 selectPiece(e);
+
 
 
             }
         });
+    }
+
+    public boolean isPieceSelected(){
+        return pieceSelected;
     }
 
     public void setChessboardLogic(ChessboardLogic chessboardLogic) {
@@ -200,9 +206,9 @@ public class ChessboardGui extends JPanel {
         System.out.println("chessboardGui.showGame() was called ! ");
     }
 
-    public void selectPiece(MouseEvent e){
+    public void selectPiece(MouseEvent event){
 
-        int[] square = getClickedSquare(e);
+        int[] square = getClickedSquare(event);
 
         int row = square[0];
         int col = square[1];
@@ -213,33 +219,59 @@ public class ChessboardGui extends JPanel {
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
-        //if a piece is already selected and destination is empty, chessboard.movePiece() handles the next click
-        if (selected && refBoard[row][col] == null) return;
+        //if a piece is already selected
+        if (pieceSelected ) {
+
+            //seamless transition between the same color pieces when clicking
+            if (refBoard[row][col] != null){
+                if (refBoard[row][col].isWhite() == refBoard[selectedRow][selectedCol].isWhite()){
+                    selectedRow = row;
+                    selectedCol = col;
+                    repaint();
+
+                    return;
+                }
+            }
+
+            Piece movingPiece = refBoard[selectedRow][selectedCol] ;
+            int[][] moveSet = movingPiece.getValidMoveSet();
+
+            for (int i = 0; i < moveSet.length; i++){
+
+                if (row == moveSet[i][0] && col == moveSet[i][1]){
+
+                    chessboardLogic.movePiece(selectedRow,selectedCol,row,col);
+                    break;
+                }
+            }
+
+            pieceSelected = false;
+            selectedCol = selectedRow = -1;
+            repaint();
+
+            return;
+        }
 
         if (refBoard[row][col] != null) {
 
             if (refBoard[row][col].isWhite() && chessboardLogic.isWhiteToMove()) {
-                selected = true;
+                pieceSelected = true;
                 selectedCol = col;
                 selectedRow = row;
-                System.out.println(Piece.colToChessCol(selectedCol)+""+Piece.rowToChessRow(selectedRow));
+
                 repaint();
             }
 
             if (!refBoard[row][col].isWhite() && !chessboardLogic.isWhiteToMove()){
-                selected = true;
+                pieceSelected = true;
                 selectedCol = col;
                 selectedRow = row;
-                System.out.println(Piece.colToChessCol(selectedCol)+""+Piece.rowToChessRow(selectedRow));
                 repaint();
             }
         } else {
-            selected = false;
-            selectedCol = -1;
-            selectedRow = -1;
+            selectedCol = selectedRow = -1;
             repaint();
         }
-
 
 
     }

@@ -6,6 +6,7 @@ public class Pawn extends Piece{
 
     public static final int PIECE_VALUE = 1;
     private boolean check = false;
+    private boolean enPassantVulnerable = false;
 
     public Pawn(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic ){
         super(chessCol,chessRow,chessboardLogic);
@@ -52,7 +53,7 @@ public class Pawn extends Piece{
 
                 if (ChessboardLogic.isSquareWithinBounds( tempMoves[1][0],tempMoves[1][1] )){
 
-                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !hasMoved()) //2 square check
+                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !hasPawnMoved()) //2 square check
                         moveSet.add(tempMoves[1]);
                 }
             }
@@ -90,6 +91,10 @@ public class Pawn extends Piece{
         for (int i = 0; i < validMoveCount; i++){
             validMoveSet[i] = moveSet.get(i);
         }
+    }
+
+    public boolean hasPawnMoved(){
+        return originalChessRow != getChessRow() || originalChessCol != getChessCol();
     }
 
     public String toString(){

@@ -7,6 +7,8 @@ public class Rook extends Piece{
     public static final int PIECE_VALUE = 5;
     private boolean check = false;
 
+    private boolean hasMoved = false;
+
     public Rook(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
         super(chessCol,chessRow,chessboardLogic);
 
@@ -67,6 +69,14 @@ public class Rook extends Piece{
         for (int i = 0; i < validMoveCount; i++){
             validMoveSet[i] = moveSet.get(i);
         }
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
+
+    public boolean getHasMoved(){
+        return hasMoved;
     }
 
     public String toString(){

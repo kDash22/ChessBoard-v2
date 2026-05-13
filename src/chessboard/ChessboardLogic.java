@@ -109,4 +109,50 @@ public class ChessboardLogic {
     public static boolean isSquareWithinBounds(int row, int col){
         return row < 8 && col < 8 && row >= 0 && col >= 0;
     }
+
+    public void movePiece(int selectedRow, int selectedCol, int selectedToRow, int selectedToCol){
+
+        Piece movingPiece = chessboard[selectedRow][selectedCol];
+
+        int[][] validMoveSet = movingPiece.getValidMoveSet();
+
+        for(int i = 0; i < validMoveSet.length; i++){
+
+            int r = validMoveSet[i][0];
+            int c = validMoveSet[i][1];
+
+            if (r == selectedToRow && c== selectedToCol){
+
+                // Castling Logic Execution
+                if (movingPiece instanceof King && Math.abs(selectedCol - selectedToCol) == 2) {
+                    int rookOriginalCol = (selectedToCol == 6) ? 7 : 0;
+                    int rookTargetCol = (selectedToCol == 6) ? 5 : 3;
+
+                    Piece rook = chessboard[selectedRow][rookOriginalCol];
+
+                    if (rook instanceof Rook) {
+
+                        rook.setChessCol(Piece.colToChessCol(rookTargetCol));
+                        ((Rook) rook).setHasMoved(true);
+                        chessboard[selectedRow][rookTargetCol] = rook;
+                        chessboard[selectedRow][rookOriginalCol] = null;
+                        rook.updateCoords(selectedRow,rookTargetCol);
+                    }
+                }
+
+                chessboard[selectedToRow][selectedToCol] = movingPiece;
+                chessboard[selectedRow][selectedCol] = null;
+                movingPiece.updateCoords(selectedToRow,selectedToCol);
+            }
+
+        }
+
+        if(movingPiece instanceof Rook && !((Rook) movingPiece).getHasMoved()){
+                ((Rook) movingPiece).setHasMoved(true);
+        }
+
+        if(movingPiece instanceof King && !((King) movingPiece).getHasMoved()){
+                ((King) movingPiece).setHasMoved(true);
+        }
+    }
 }

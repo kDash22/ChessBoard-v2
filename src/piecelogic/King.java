@@ -6,6 +6,8 @@ public class King extends Piece{
 
     private boolean check = false;
 
+    private boolean hasMoved = false;
+
     public King(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
         super(chessCol,chessRow,chessboardLogic);
 
@@ -85,11 +87,23 @@ public class King extends Piece{
             }
             if (remove) moveSet.remove(i);
         }
+        // --- Castling Logic ---
+        if (!getHasMoved() /* && !ChessBoard.isKingInCheck(getIdentification().isWhite()) */ ) {
+            // King Side Castling
+            if (refBoard[row][7] instanceof Rook rook && !rook.getHasMoved()) {
+                if (refBoard[row][5] == null && refBoard[row][6] == null) {
+                    moveSet.add(new int[] {row, 6});
+                }
+            }
+            // Queen Side Castling
+            if (refBoard[row][0] instanceof Rook rook && !rook.getHasMoved()) {
+                if (refBoard[row][1] == null && refBoard[row][2] == null && refBoard[row][3] == null) {
+                    moveSet.add(new int[] {row, 2});
+                }
+            }
+        }
 
-
-
-
-        //implement castling
+        //implement checks
 
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
@@ -97,6 +111,14 @@ public class King extends Piece{
         for (int i = 0; i < validMoveCount; i++){
             validMoveSet[i] = moveSet.get(i);
         }
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
+
+    public boolean getHasMoved(){
+        return hasMoved;
     }
 
     public String toString(){
