@@ -92,14 +92,12 @@ public class King extends Piece{
             // King Side Castling
             if (refBoard[row][7] instanceof Rook rook && !rook.getHasMoved()) {
                 if (refBoard[row][5] == null && refBoard[row][6] == null) {
-                    setHasMoved(true);
                     moveSet.add(new int[] {row, 6});
                 }
             }
             // Queen Side Castling
             if (refBoard[row][0] instanceof Rook rook && !rook.getHasMoved()) {
                 if (refBoard[row][1] == null && refBoard[row][2] == null && refBoard[row][3] == null) {
-                    setHasMoved(true);
                     moveSet.add(new int[] {row, 2});
                 }
             }

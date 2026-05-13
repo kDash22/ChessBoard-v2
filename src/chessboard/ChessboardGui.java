@@ -40,13 +40,7 @@ public class ChessboardGui extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e){
-                /*
-                if (pieceSelected){
-                    movePiece(e);
-                } else {
-                    selectPiece(e);
-                }
-                 */
+
                 selectPiece(e);
 
 
@@ -167,7 +161,7 @@ public class ChessboardGui extends JPanel {
 
         }
 
-        //highlight a isPieceSelected square
+        //highlight a selected square
         if (selectedRow != -1 && selectedCol != -1) {
             Piece selected = chessboardLogic.chessboard[selectedRow][selectedCol];
             if (selected != null) {

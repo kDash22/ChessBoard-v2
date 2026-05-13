@@ -53,7 +53,7 @@ public class Pawn extends Piece{
 
                 if (ChessboardLogic.isSquareWithinBounds( tempMoves[1][0],tempMoves[1][1] )){
 
-                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !hasMovedCheckPawn()) //2 square check
+                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !hasPawnMoved()) //2 square check
                         moveSet.add(tempMoves[1]);
                 }
             }
@@ -93,7 +93,7 @@ public class Pawn extends Piece{
         }
     }
 
-    public boolean hasMovedCheckPawn(){
+    public boolean hasPawnMoved(){
         return originalChessRow != getChessRow() || originalChessCol != getChessCol();
     }
 
