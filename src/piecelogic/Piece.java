@@ -138,9 +138,5 @@ public abstract class Piece {
 
     }
 
-    public boolean hasMoved(){
-        return originalChessRow != chessRow || originalChessCol != chessCol;
-    }
-
     public abstract void moveCheck();
 }

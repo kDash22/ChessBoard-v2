@@ -226,7 +226,18 @@ public class ChessboardGui extends JPanel {
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
         //if a piece is already selected
-        if (pieceSelected) {
+        if (pieceSelected ) {
+
+            //seamless transition between the same color pieces when clicking
+            if (refBoard[row][col] != null){
+                if (refBoard[row][col].isWhite() == refBoard[selectedRow][selectedCol].isWhite()){
+                    selectedRow = row;
+                    selectedCol = col;
+                    repaint();
+
+                    return;
+                }
+            }
 
             Piece movingPiece = refBoard[selectedRow][selectedCol] ;
             int[][] moveSet = movingPiece.getValidMoveSet();

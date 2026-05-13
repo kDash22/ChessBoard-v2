@@ -123,11 +123,36 @@ public class ChessboardLogic {
 
             if (r == selectedToRow && c== selectedToCol){
 
+                // Castling Logic Execution
+                if (movingPiece instanceof King && Math.abs(selectedCol - selectedToCol) == 2) {
+                    int rookOriginalCol = (selectedToCol == 6) ? 7 : 0;
+                    int rookTargetCol = (selectedToCol == 6) ? 5 : 3;
+
+                    Piece rook = chessboard[selectedRow][rookOriginalCol];
+
+                    if (rook instanceof Rook) {
+
+                        rook.setChessCol(Piece.colToChessCol(rookTargetCol));
+                        ((Rook) rook).setHasMoved(true);
+                        chessboard[selectedRow][rookTargetCol] = rook;
+                        chessboard[selectedRow][rookOriginalCol] = null;
+                        rook.updateCoords(selectedRow,rookTargetCol);
+                    }
+                }
+
                 chessboard[selectedToRow][selectedToCol] = movingPiece;
                 chessboard[selectedRow][selectedCol] = null;
                 movingPiece.updateCoords(selectedToRow,selectedToCol);
             }
 
+        }
+
+        if(movingPiece instanceof Rook && !((Rook) movingPiece).getHasMoved()){
+                ((Rook) movingPiece).setHasMoved(true);
+        }
+
+        if(movingPiece instanceof King && !((King) movingPiece).getHasMoved()){
+                ((King) movingPiece).setHasMoved(true);
         }
     }
 }
