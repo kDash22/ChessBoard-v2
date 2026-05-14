@@ -9,22 +9,16 @@ public class Rook extends Piece{
 
     private boolean hasMoved = false;
 
-    public Rook(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
-        super(chessCol,chessRow,chessboardLogic);
+    public Rook(char file, int chessRow, boolean isWhite){
+        super(isWhite,PieceType.ROOK,file,chessRow);
 
-        setChessCol(chessCol);
+        setFile(file);
         setChessRow(chessRow);
 
-        if (isWhite){
-            setID(PieceId.W_ROOK);
-        } else {
-            setID(PieceId.B_ROOK);
-        }
-        chessboardLogic.insertPieceToBoard(this);
     }
 
     @Override
-    public void moveCheck() {
+    public void moveCheck(ChessboardLogic chessboardLogic) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -37,8 +31,8 @@ public class Rook extends Piece{
         //a Rook can move in 4 directions
         int[][] directions = {{1,0},{0,1},{-1,0},{0,-1}};
 
-        int col = chessColToIndex(getChessCol());
-        int row = chessRowToIndex(getChessRow());
+        int col = fileToCol(getFile());
+        int row = chessRowToRow(getChessRow());
 
         for (int[] direction : directions){
             int toRow = row + direction[0];
@@ -71,6 +65,38 @@ public class Rook extends Piece{
         }
     }
 
+    @Override
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+
+        int targetCol = fileToCol(targetFile);
+        int targetRow = chessRowToRow(targetChessRow);
+
+        int row = chessRowToRow(getChessRow());
+        int col = fileToCol(getFile());
+
+        if (targetRow != row && targetCol != col)
+            return false;
+
+        int rowDir = Integer.compare(targetRow,row);
+        int colDir = Integer.compare(targetCol,col);
+
+        int r = row+rowDir;
+        int c = col+colDir;
+
+        while (targetCol != c || targetRow != r){
+
+            if (chessboardLogic.getChessboard()[r][c] != null){
+                return false;
+
+            }
+
+            r += rowDir;
+            c += colDir;
+        }
+
+        return true;
+    }
+
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
     }
@@ -81,7 +107,7 @@ public class Rook extends Piece{
 
     public String toString(){
         String tag = isWhite() ? "White Rook at " : "Black Rook at ";
-        tag += getChessCol()+""+getChessRow();
+        tag += getFile()+""+getChessRow();
         return tag;
     }
 }

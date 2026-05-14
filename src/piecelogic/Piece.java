@@ -9,25 +9,26 @@ public abstract class Piece {
     List<int[]> moveSet = new ArrayList<>();
     protected int[][] validMoveSet;
 
-    private PieceId id;
-
-    protected final char originalChessCol;
+    protected final char originalFile;
     protected final int originalChessRow;
 
-    private char chessCol;
+    private char file;
     private int chessRow;
 
-    protected ChessboardLogic chessboardLogic;
+    private boolean isWhite;
+    private PieceType pieceType;
 
     public static final List<Character> COLUMN_LETTERS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
 
-    protected Piece(char originalChessCol, int originalChessRow, ChessboardLogic chessboardLogic) {
+    protected Piece(boolean isWhite, PieceType pieceType, char originalFile, int originalChessRow) {
 
-        Character chessColObj = originalChessCol;
-        if (COLUMN_LETTERS.contains(chessColObj)) {
-            this.originalChessCol = originalChessCol;
+        Character fileObj = originalFile;
+        this.isWhite = isWhite;
+        this.pieceType = pieceType;
+        if (COLUMN_LETTERS.contains(fileObj)) {
+            this.originalFile = originalFile;
         } else {
-            throw new IllegalArgumentException("Chess column letter not valid ! : "+originalChessCol);
+            throw new IllegalArgumentException("Chess column letter not valid ! : "+ originalFile);
         }
 
         if (originalChessRow > 0 && originalChessRow <= 8) {
@@ -35,18 +36,17 @@ public abstract class Piece {
         } else {
             throw new IllegalArgumentException("Chess row not valid ! : "+originalChessRow);
         }
-
-        this.chessboardLogic = chessboardLogic;
+        ;
 
     }
 
     //setters
-    public void setChessCol(char chessCol){
-        Character chessColObj = chessCol;
-        if (COLUMN_LETTERS.contains(chessColObj)) {
-            this.chessCol = chessCol;
+    public void setFile(char file){
+        Character fileObj = file;
+        if (COLUMN_LETTERS.contains(fileObj)) {
+            this.file = file;
         } else {
-            throw new IllegalArgumentException("Chess column letter not valid ! : "+chessCol);
+            throw new IllegalArgumentException("Chess column letter not valid ! : "+file);
         }
             
     }
@@ -59,28 +59,24 @@ public abstract class Piece {
         }
     }
 
-    public void setID(PieceId id){
-        this.id = id;
-    }
-
     //getters
-    public char getChessCol(){
-        return chessCol;
+    public char getFile(){
+        return file;
     }
 
     public int getChessRow(){
         return chessRow;
     }
 
-    public char getOriginalChessCol() {
-        return originalChessCol;
+    public char getOriginalFile() {
+        return originalFile;
     }
 
     public int getOriginalChessRow() {
         return originalChessRow;
     }
 
-    public List<int[]> getMoveSet() {
+    public List<int[]> getPseudoLegalMoves() {
         return moveSet;
     }
 
@@ -88,27 +84,27 @@ public abstract class Piece {
         return validMoveSet;
     }
 
-    public PieceId getId(){
-        return id;
+    public PieceType getPieceType(){
+        return pieceType;
     }
 
     // a method used to convert column letter into int to be used in arrays
-    public static int chessColToIndex(Character chessCol) {
-        if (!COLUMN_LETTERS.contains(chessCol)) {
-            throw new IllegalArgumentException(" COLUMN LETTER NOT VALID ! : " + chessCol);
+    public static int fileToCol(Character file) {
+        if (!COLUMN_LETTERS.contains(file)) {
+            throw new IllegalArgumentException(" COLUMN LETTER NOT VALID ! : " + file);
         }
-        return (chessCol - 'a');
+        return (file - 'a');
     }
 
     // a method used to convert array col number to chess column number
-    public static char colToChessCol(int col) {
+    public static char colToFile(int col) {
         if (col > 7 || col < 0)
             throw new IllegalArgumentException(" Array Column number must be between 0 and 7 ! :" + col);
         return (char) ('a' + col);
     }
 
     // a method used to convert chess rows into int to be used in arrays
-    public static int chessRowToIndex(int chessRow) {
+    public static int chessRowToRow(int chessRow) {
         if (chessRow < 1 || chessRow > 8) {
             throw new IllegalArgumentException("chessRow must be between 1 and 8: " + chessRow);
         }
@@ -124,19 +120,20 @@ public abstract class Piece {
     }
 
     public boolean isWhite(){
-        return getId().isWhite();
+        return isWhite;
     }
 
     public boolean isKing(){
-        return getId() == PieceId.W_KING ||
-                getId() == PieceId.B_KING;
+        return getPieceType() == PieceType.KING;
     }
 
     public void updateCoords(int row, int col){
         setChessRow(rowToChessRow(row));
-        setChessCol(colToChessCol(col));
+        setFile(colToFile(col));
 
     }
 
-    public abstract void moveCheck();
+    public abstract boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow);
+
+    public abstract void moveCheck(ChessboardLogic chessboardLogic);
 }

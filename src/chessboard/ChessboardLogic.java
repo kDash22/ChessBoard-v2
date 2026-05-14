@@ -41,8 +41,8 @@ public class ChessboardLogic {
     }
 
     public void insertPieceToBoard(Piece piece){
-        int col = Piece.chessColToIndex(piece.getChessCol());
-        int row = Piece.chessRowToIndex(piece.getChessRow());
+        int col = Piece.fileToCol(piece.getFile());
+        int row = Piece.chessRowToRow(piece.getChessRow());
 
         this.chessboard[row][col] = piece;
         //System.out.println("piece inserted into the board ! ");
@@ -52,48 +52,37 @@ public class ChessboardLogic {
 
         chessboardGui.setChessboardLogic(this);
 
-        Piece[][] emptyBoard = new Piece[8][8];
-        setChessboard(emptyBoard);
+        setChessboard(new Piece[8][8]);
 
-        //white pieces
-        Rook wR1 = new Rook('a',1,true,this);
-        Knight wN1 = new Knight('b',1,true,this);
-        Bishop wB1 = new Bishop('c',1,true,this);
-        Queen wQ  = new Queen('d',1,true,this);
-        King wK   = new King('e',1,true,this);
-        Bishop wB2 = new Bishop('f',1,true,this);
-        Knight wN2 = new Knight('g',1,true,this);
-        Rook wR2 = new Rook('h',1,true,this);
+        // white pieces
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.ROOK,   'a', 1, true, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT, 'b', 1, true, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP, 'c', 1, true, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,  'd', 1, true, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,   'e', 1, true, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP, 'f', 1, true, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT, 'g', 1, true, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.ROOK,   'h', 1, true, this));
 
-        Pawn wP1 = new Pawn('a',2,true,this);
-        Pawn wP2 = new Pawn('b',2,true,this);
-        Pawn wP3 = new Pawn('c',2,true,this);
-        Pawn wP4 = new Pawn('d',2,true,this);
-        Pawn wP5 = new Pawn('e',2,true,this);
-        Pawn wP6 = new Pawn('f',2,true,this);
-        Pawn wP7 = new Pawn('g',2,true,this);
-        Pawn wP8 = new Pawn('h',2,true,this);
+        for (char f = 'a'; f <= 'h'; f++) {
+            insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, f, 2, true, this));
+        }
 
-        //black pieces
-        Rook bR1 = new Rook('a',8,false,this);
-        Knight bN1 = new Knight('b',8,false,this);
-        Bishop bB1 = new Bishop('c',8,false,this);
-        Queen bQ  = new Queen('d',8,false,this);
-        King bK   = new King('e',8,false,this);
-        Bishop bB2 = new Bishop('f',8,false,this);
-        Knight bN2 = new Knight('g',8,false,this);
-        Rook bR2 = new Rook('h',8,false,this);
+        // black pieces
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.ROOK,   'a', 8, false, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT, 'b', 8, false, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP, 'c', 8, false, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,  'd', 8, false, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,   'e', 8, false, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP, 'f', 8, false, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT, 'g', 8, false, this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.ROOK,   'h', 8, false, this));
 
-        Pawn bP1 = new Pawn('a',7,false,this);
-        Pawn bP2 = new Pawn('b',7,false,this);
-        Pawn bP3 = new Pawn('c',7,false,this);
-        Pawn bP4 = new Pawn('d',7,false,this);
-        Pawn bP5 = new Pawn('e',7,false,this);
-        Pawn bP6 = new Pawn('f',7,false,this);
-        Pawn bP7 = new Pawn('g',7,false,this);
-        Pawn bP8 = new Pawn('h',7,false,this);
+        for (char f = 'a'; f <= 'h'; f++) {
+            insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, f, 7, false, this));
+        }
 
-        System.out.println("Chessboard.newGame() was called ! ");
+        System.out.println("Chessboard.newGame() was called!");
     }
 
     public void customBoard(){
@@ -102,7 +91,9 @@ public class ChessboardLogic {
         Piece[][] emptyBoard = new Piece[8][8];
         setChessboard(emptyBoard);
 
-        King wK   = new King('e',4,true,this);
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,true,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,true,this));
+
 
     }
 
@@ -132,7 +123,7 @@ public class ChessboardLogic {
 
                     if (rook instanceof Rook) {
 
-                        rook.setChessCol(Piece.colToChessCol(rookTargetCol));
+                        rook.setFile(Piece.colToFile(rookTargetCol));
                         ((Rook) rook).setHasMoved(true);
                         chessboard[selectedRow][rookTargetCol] = rook;
                         chessboard[selectedRow][rookOriginalCol] = null;
@@ -154,5 +145,25 @@ public class ChessboardLogic {
         if(movingPiece instanceof King && !((King) movingPiece).getHasMoved()){
                 ((King) movingPiece).setHasMoved(true);
         }
+    }
+
+    //a method to check if a square is attacked by a specified color
+    public boolean isSquareAttacked(boolean attackerIsWhite, char file, int chessRow){
+
+        for (int r = 0; r < 8; r++){
+            for (int c = 0; c < 8; c++ ){
+
+                Piece piece = chessboard[r][c];
+                if (piece != null &&
+                        piece.isWhite() == attackerIsWhite &&
+                        piece.attacksSquare(this, file, chessRow)){
+
+                    return true;
+                }
+
+            }
+        }
+
+        return false;
     }
 }

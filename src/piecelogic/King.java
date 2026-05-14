@@ -8,21 +8,24 @@ public class King extends Piece{
 
     private boolean hasMoved = false;
 
-    public King(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
-        super(chessCol,chessRow,chessboardLogic);
+    public King(char file, int chessRow, boolean isWhite){
+        super(isWhite,PieceType.KING,file,chessRow);
 
-        setChessCol(chessCol);
+        setFile(file);
         setChessRow(chessRow);
-
-        if (isWhite){
-            setID(PieceId.W_KING);
-        } else {
-            setID(PieceId.B_KING);
-        }
-        chessboardLogic.insertPieceToBoard(this);    }
+    }
 
     @Override
-    public void moveCheck() {
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+
+        int targetCol = fileToCol(targetFile);
+        int targetRow = chessRowToRow(targetChessRow);
+
+        return false;
+    }
+
+    @Override
+    public void moveCheck(ChessboardLogic chessboardLogic) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -30,8 +33,8 @@ public class King extends Piece{
             return;
         }
 
-        int row = chessRowToIndex(getChessRow());
-        int col = chessColToIndex(getChessCol());
+        int row = chessRowToRow(getChessRow());
+        int col = fileToCol(getFile());
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
@@ -123,7 +126,7 @@ public class King extends Piece{
 
     public String toString(){
         String tag = isWhite() ? "White King at " : "Black King at ";
-        tag += getChessCol()+""+getChessRow();
+        tag += getFile()+""+getChessRow();
         return tag;
     }
 }

@@ -30,7 +30,7 @@ public class Global {
         }
         for (int[] move : arr){
             int chessRow = Piece.rowToChessRow(move[0]);
-            char chessCol = Piece.colToChessCol(move[1]);
+            char chessCol = Piece.colToFile(move[1]);
             System.out.println("move : "+chessCol+chessRow);
         }
         System.out.println();
