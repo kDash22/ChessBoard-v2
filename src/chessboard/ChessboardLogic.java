@@ -92,8 +92,9 @@ public class ChessboardLogic {
         Piece[][] emptyBoard = new Piece[8][8];
         setChessboard(emptyBoard);
 
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,true,this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,true,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,'e',3,true,this));
+        //insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,true,this));
+        //insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,true,this));
 
 
     }
