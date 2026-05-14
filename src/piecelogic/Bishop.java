@@ -83,12 +83,10 @@ public class Bishop extends Piece{
         int c = col+colDir;
 
         while (r != targetRow && c != targetCol){
-            if (!ChessboardLogic.isSquareWithinBounds(r, c)) continue;
 
-            if (chessboardLogic.getChessboard()[r][c] != null){
-                return false;
+            if (!ChessboardLogic.isSquareWithinBounds(r, c)) return false;
 
-            }
+            if (chessboardLogic.getChessboard()[r][c] != null) return false;
 
             r += rowDir;
             c += colDir;

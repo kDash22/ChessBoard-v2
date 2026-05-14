@@ -67,10 +67,8 @@ public class Queen extends Piece{
     public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
 
         Bishop bishopLogic = new Bishop(getFile(),getChessRow(),isWhite());
-        bishopLogic.attacksSquare(chessboardLogic, targetFile,targetChessRow);
 
         Rook rookLogic = new Rook(getFile(),getChessRow(),isWhite());
-
 
         return bishopLogic.attacksSquare(chessboardLogic, targetFile,targetChessRow)
                 || rookLogic.attacksSquare(chessboardLogic,targetFile,targetChessRow);

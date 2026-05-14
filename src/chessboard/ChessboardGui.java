@@ -345,7 +345,7 @@ public class ChessboardGui extends JPanel {
 
         ChessboardLogic chessboardLogic = new ChessboardLogic();
         //chessboardLogic.newGame();
-        chessboardLogic.customBoard();
+        chessboardLogic.customBoard(); // used for testing and debugging
         chessboardLogic.getChessboardGui().showGame();
         System.out.println();
         System.out.println();

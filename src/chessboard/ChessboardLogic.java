@@ -85,6 +85,7 @@ public class ChessboardLogic {
         System.out.println("Chessboard.newGame() was called!");
     }
 
+    //for testing purposes
     public void customBoard(){
         chessboardGui.setChessboardLogic(this);
 
