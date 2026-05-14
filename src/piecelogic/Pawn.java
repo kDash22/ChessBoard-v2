@@ -8,21 +8,17 @@ public class Pawn extends Piece{
     private boolean check = false;
     private boolean enPassantVulnerable = false;
 
-    public Pawn(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic ){
-        super(chessCol,chessRow,chessboardLogic);
+    public Pawn(char file, int chessRow, boolean isWhite ){
+        super(isWhite,PieceType.PAWN,file,chessRow);
 
-        setChessCol(chessCol);
+        setFile(file);
         setChessRow(chessRow);
 
-        if (isWhite){
-            setID(PieceId.W_PAWN);
-        } else {
-            setID(PieceId.B_PAWN);
-        }
-        chessboardLogic.insertPieceToBoard(this);    }
+    }
+
 
     @Override
-    public void moveCheck() {
+    public void moveCheck(ChessboardLogic chessboardLogic) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -32,8 +28,8 @@ public class Pawn extends Piece{
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
-        int col = chessColToIndex(getChessCol());
-        int row = chessRowToIndex(getChessRow());
+        int col = fileToCol(getFile());
+        int row = chessRowToRow(getChessRow());
 
         //there are 4 general moves for a pawn
         // move 1 square forward, move 2 squares forward (only as the first move), take diagonally to the left and right
@@ -93,13 +89,27 @@ public class Pawn extends Piece{
         }
     }
 
+    @Override
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+
+        int targetCol = fileToCol(targetFile);
+        int targetRow = chessRowToRow(targetChessRow);
+
+        int rowDir = isWhite() ? -1 : 1;
+
+        return (targetRow == chessRowToRow(getChessRow())+rowDir
+                && (targetCol == fileToCol(getFile()) - 1 || targetCol == fileToCol(getFile()) + 1)) ;
+
+    }
+
     public boolean hasPawnMoved(){
-        return originalChessRow != getChessRow() || originalChessCol != getChessCol();
+        return originalChessRow != getChessRow() || originalFile != getFile();
     }
 
     public String toString(){
         String tag = isWhite() ? "White Pawn at " : "Black Pawn at ";
-        tag += getChessCol()+""+getChessRow();
+        tag += getFile()+""+getChessRow();
         return tag;
     }
+
 }

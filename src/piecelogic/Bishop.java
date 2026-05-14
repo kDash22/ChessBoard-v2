@@ -1,6 +1,5 @@
 package piecelogic;
 
-import chessboard.ChessboardGui;
 import chessboard.ChessboardLogic;
 
 public class Bishop extends Piece{
@@ -8,22 +7,16 @@ public class Bishop extends Piece{
     public static final int PIECE_VALUE = 3;
     private boolean check = false;
 
-    public Bishop(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
-        super(chessCol,chessRow,chessboardLogic);
+    public Bishop(char file, int chessRow, boolean isWhite){
+        super(isWhite,PieceType.BISHOP,file,chessRow);
 
-        setChessCol(chessCol);
+        setFile(file);
         setChessRow(chessRow);
 
-        if (isWhite){
-            setID(PieceId.W_BISHOP);
-        } else {
-            setID(PieceId.B_BISHOP);
-        }
-        chessboardLogic.insertPieceToBoard(this);
     }
 
     @Override
-    public void moveCheck() {
+    public void moveCheck(ChessboardLogic chessboardLogic) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -36,8 +29,8 @@ public class Bishop extends Piece{
         //a bishop can move in 4 directions
         int[][] directions = {{1,1},{-1,1},{-1,-1},{1,-1}};
 
-        int col = chessColToIndex(getChessCol());
-        int row = chessRowToIndex(getChessRow());
+        int col = fileToCol(getFile());
+        int row = chessRowToRow(getChessRow());
 
         for (int[] direction : directions){
             int toRow = row + direction[0];
@@ -70,9 +63,41 @@ public class Bishop extends Piece{
         }
     }
 
+
+    @Override
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+
+        int targetCol = fileToCol(targetFile);
+        int targetRow = chessRowToRow(targetChessRow);
+
+        int row = chessRowToRow(getChessRow());
+        int col = fileToCol(getFile());
+
+        if (Math.abs(targetRow - row) != Math.abs(targetCol - col))
+            return false;
+
+        int rowDir = (targetRow > row) ? 1 : -1;
+        int colDir = (targetCol > col) ? 1 : -1;
+
+        int r = row+rowDir;
+        int c = col+colDir;
+
+        while (r != targetRow && c != targetCol){
+
+            if (!ChessboardLogic.isSquareWithinBounds(r, c)) return false;
+
+            if (chessboardLogic.getChessboard()[r][c] != null) return false;
+
+            r += rowDir;
+            c += colDir;
+        }
+
+        return true;
+    }
+
     public String toString(){
         String tag = isWhite() ? "White Bishop at " : "Black Bishop at ";
-        tag += getChessCol()+""+getChessRow();
+        tag += getFile()+""+getChessRow();
         return tag;
     }
 }

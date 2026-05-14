@@ -7,21 +7,16 @@ public class Queen extends Piece{
     public static final int PIECE_VALUE = 9;
     private boolean check = false;
 
-    public Queen(char chessCol, int chessRow, boolean isWhite, ChessboardLogic chessboardLogic){
-        super(chessCol,chessRow,chessboardLogic);
+    public Queen(char file, int chessRow, boolean isWhite){
+        super(isWhite,PieceType.QUEEN,file,chessRow);
 
-        setChessCol(chessCol);
+        setFile(file);
         setChessRow(chessRow);
 
-        if (isWhite){
-            setID(PieceId.W_QUEEN);
-        } else {
-            setID(PieceId.B_QUEEN);
-        }
-        chessboardLogic.insertPieceToBoard(this);    }
+    }
 
     @Override
-    public void moveCheck() {
+    public void moveCheck(ChessboardLogic chessboardLogic) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -34,8 +29,8 @@ public class Queen extends Piece{
         //a Queen can move in 8 directions
         int[][] directions = {{1,0},{1,1},{0,1},{-1,1},{-1,0},{-1,-1},{0,-1},{1,-1}};
 
-        int col = chessColToIndex(getChessCol());
-        int row = chessRowToIndex(getChessRow());
+        int col = fileToCol(getFile());
+        int row = chessRowToRow(getChessRow());
 
         for (int[] direction : directions){
             int toRow = row + direction[0];
@@ -68,9 +63,20 @@ public class Queen extends Piece{
         }
     }
 
+    @Override
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+
+        Bishop bishopLogic = new Bishop(getFile(),getChessRow(),isWhite());
+
+        Rook rookLogic = new Rook(getFile(),getChessRow(),isWhite());
+
+        return bishopLogic.attacksSquare(chessboardLogic, targetFile,targetChessRow)
+                || rookLogic.attacksSquare(chessboardLogic,targetFile,targetChessRow);
+    }
+
     public String toString(){
         String tag = isWhite() ? "White Queen at " : "Black Queen at ";
-        tag += getChessCol()+""+getChessRow();
+        tag += getFile()+""+getChessRow();
         return tag;
     }
 }

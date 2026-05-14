@@ -115,7 +115,7 @@ public class ChessboardGui extends JPanel {
                 if ((row + col) % 2 == 0) g2d.setColor(Color.BLACK);
                 else g2d.setColor(Color.WHITE);
 
-                //print first chessRow and first chessCol only
+                //print first chessRow and first file only
                 if (row == 7 ) {
                     //bottom right corner in the square
                     int x =  col * TILE_SIZE + (TILE_SIZE * 8 / 10) ;
@@ -217,6 +217,11 @@ public class ChessboardGui extends JPanel {
             return;
         }
 
+        int chessRow = Piece.rowToChessRow(row);
+        char file = Piece.colToFile(col);
+
+        System.out.println("Is "+file+chessRow+" attacked : "+chessboardLogic.isSquareAttacked(true,file,chessRow));
+
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
         //if a piece is already selected
@@ -224,6 +229,17 @@ public class ChessboardGui extends JPanel {
 
             //seamless transition between the same color pieces when clicking
             if (refBoard[row][col] != null){
+
+                //deselect if clicked on the same piece
+                if (selectedCol == col && selectedRow == row){
+                    selectedRow = -1;
+                    selectedCol = -1;
+                    pieceSelected = false;
+                    repaint();
+
+                    return;
+                }
+
                 if (refBoard[row][col].isWhite() == refBoard[selectedRow][selectedCol].isWhite()){
                     selectedRow = row;
                     selectedCol = col;
@@ -304,7 +320,7 @@ public class ChessboardGui extends JPanel {
         if (piece == null) return;
 
         //check on this
-        piece.moveCheck();
+        piece.moveCheck(chessboardLogic);
         int[][] moveSet = piece.getValidMoveSet();
         Global.printValidMoveSet(moveSet);
 
@@ -328,26 +344,22 @@ public class ChessboardGui extends JPanel {
     public static void main(String[] args){
 
         ChessboardLogic chessboardLogic = new ChessboardLogic();
-        chessboardLogic.newGame();
-        //chessboardLogic.customBoard();
+        //chessboardLogic.newGame();
+        chessboardLogic.customBoard(); // used for testing and debugging
         chessboardLogic.getChessboardGui().showGame();
         System.out.println();
         System.out.println();
-
 
         for (int row = 0; row < 8; row++){
             for (int col = 0; col < 8; col++){
                 Piece piece = chessboardLogic.chessboard[row][col];
                 if (piece != null){
-                    piece.moveCheck();
+                    piece.moveCheck(chessboardLogic);
                     System.out.println(piece);
                     Global.printValidMoveSet(piece.getValidMoveSet());
                 }
             }
         }
-
-
-        
     }
 
 }
