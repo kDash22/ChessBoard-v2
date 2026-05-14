@@ -10,6 +10,9 @@ public class ChessboardLogic {
 
     protected Piece[][] chessboard = new Piece[8][8];//logical representation of the 8 x 8 board
 
+    private King wKing,bKing;
+
+
     public ChessboardLogic(){
         System.out.println("chessboardLogic obj created ! ");
         chessboardGui = new ChessboardGui();
@@ -45,6 +48,15 @@ public class ChessboardLogic {
         int row = Piece.chessRowToRow(piece.getChessRow());
 
         this.chessboard[row][col] = piece;
+
+        if (piece instanceof King){
+
+            if (piece.isWhite()){
+                wKing = (King) piece;
+            } else {
+                bKing = (King) piece;
+            }
+        }
         //System.out.println("piece inserted into the board ! ");
     }
 
@@ -93,8 +105,8 @@ public class ChessboardLogic {
         setChessboard(emptyBoard);
 
         insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,'e',3,true,this));
-        //insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,true,this));
-        //insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,true,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,false,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,false,this));
 
 
     }
@@ -167,5 +179,27 @@ public class ChessboardLogic {
         }
 
         return false;
+    }
+
+    public int[] getKingPos(boolean isWhite){
+
+        King king = isWhite ? wKing : bKing;
+
+        int row = Piece.rowToChessRow(king.getChessRow());
+        int col = Piece.fileToCol(king.getFile());
+
+        return new int[]{row,col};
+
+
+    }
+
+    public boolean isKingInCheck(boolean isWhite){
+
+        int[] kingPos = getKingPos(isWhite);
+
+        int row = Piece.rowToChessRow(kingPos[0]);
+        char col = Piece.colToFile(kingPos[1]);
+
+        return isSquareAttacked(!isWhite,col,row);
     }
 }

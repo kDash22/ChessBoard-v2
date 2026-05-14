@@ -289,7 +289,7 @@ public class ChessboardGui extends JPanel {
             repaint();
         }
 
-
+        System.out.println("is king in check : "+chessboardLogic.isKingInCheck(true));
     }
 
     private int[] getClickedSquare(MouseEvent event){
