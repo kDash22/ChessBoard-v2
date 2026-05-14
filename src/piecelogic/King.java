@@ -97,6 +97,8 @@ public class King extends Piece{
             }
         }
 
+        filterIllegalMoves(chessboardLogic,moveSet);
+
         //implement checks
 
         int validMoveCount = moveSet.size();

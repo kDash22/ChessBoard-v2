@@ -6,7 +6,7 @@ public class ChessboardLogic {
 
     protected ChessboardGui chessboardGui;
 
-    protected boolean whiteToMove = false;
+    private boolean whiteToMove ;
 
     protected Piece[][] chessboard = new Piece[8][8];//logical representation of the 8 x 8 board
 
@@ -16,7 +16,7 @@ public class ChessboardLogic {
     public ChessboardLogic(){
         System.out.println("chessboardLogic obj created ! ");
         chessboardGui = new ChessboardGui();
-        whiteToMove = true; //check this out later
+        whiteToMove = false; //check this out later
     }
     //setters
     public void setChessboard(Piece[][] board){
@@ -63,6 +63,7 @@ public class ChessboardLogic {
     public void newGame(){
 
         chessboardGui.setChessboardLogic(this);
+        setWhiteToMove(true);
 
         setChessboard(new Piece[8][8]);
 
@@ -100,13 +101,16 @@ public class ChessboardLogic {
     //for testing purposes
     public void customBoard(){
         chessboardGui.setChessboardLogic(this);
+        setWhiteToMove(true);
 
         Piece[][] emptyBoard = new Piece[8][8];
         setChessboard(emptyBoard);
 
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,'e',1,false,this));
         insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,'e',3,true,this));
         insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,false,this));
         insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,false,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,'d',7,true,this));
 
 
     }
@@ -148,6 +152,8 @@ public class ChessboardLogic {
                 chessboard[selectedToRow][selectedToCol] = movingPiece;
                 chessboard[selectedRow][selectedCol] = null;
                 movingPiece.updateCoords(selectedToRow,selectedToCol);
+
+                setWhiteToMove(!whiteToMove);
             }
 
         }
@@ -185,7 +191,7 @@ public class ChessboardLogic {
 
         King king = isWhite ? wKing : bKing;
 
-        int row = Piece.rowToChessRow(king.getChessRow());
+        int row = Piece.chessRowToRow(king.getChessRow());
         int col = Piece.fileToCol(king.getFile());
 
         return new int[]{row,col};

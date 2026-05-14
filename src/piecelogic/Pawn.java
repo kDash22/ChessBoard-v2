@@ -79,6 +79,9 @@ public class Pawn extends Piece{
             }
         }
 
+        filterIllegalMoves(chessboardLogic,moveSet);
+
+
         //implement en passant
 
         int validMoveCount = moveSet.size();

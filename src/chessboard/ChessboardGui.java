@@ -171,7 +171,7 @@ public class ChessboardGui extends JPanel {
                 g2d.fillRect(selectedCol * TILE_SIZE, selectedRow * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
-
+        highlightCheckedKing(g2d);
         g2d.translate(-offsetX, -offsetY);
     }
 
@@ -217,10 +217,16 @@ public class ChessboardGui extends JPanel {
             return;
         }
 
+        /*
         int chessRow = Piece.rowToChessRow(row);
         char file = Piece.colToFile(col);
 
         System.out.println("Is "+file+chessRow+" attacked : "+chessboardLogic.isSquareAttacked(true,file,chessRow));
+        int[] kingPos = chessboardLogic.getKingPos(true);
+
+        System.out.println("\nwhite king pos"+Piece.colToFile(kingPos[1])+Piece.rowToChessRow(kingPos[0]));
+
+         */
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
@@ -289,7 +295,8 @@ public class ChessboardGui extends JPanel {
             repaint();
         }
 
-        System.out.println("is king in check : "+chessboardLogic.isKingInCheck(true));
+        repaint();
+        //System.out.println("is king in check : "+chessboardLogic.isKingInCheck(true));
     }
 
     private int[] getClickedSquare(MouseEvent event){
@@ -332,11 +339,26 @@ public class ChessboardGui extends JPanel {
             if (row < 0 || row >= 8 || col < 0 || col >= 8)
                 continue;
             if (chessboardLogic.getChessboard()[row][col] != null) {
-                g2d.setColor(new Color(255, 0, 0, 60));
+                g2d.setColor(new Color(255, 0, 0, 35));
             } else {
-                g2d.setColor(new Color(0, 255, 0, 60));
+                g2d.setColor(new Color(0, 255, 0, 35));
             }
 
+            g2d.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
+
+    }
+
+    private void highlightCheckedKing(Graphics2D g2d){
+
+        boolean whiteToMove = chessboardLogic.isWhiteToMove();
+
+        if (chessboardLogic.isKingInCheck(whiteToMove)){
+            int[] kingPos = chessboardLogic.getKingPos(whiteToMove);
+            int row = kingPos[0];
+            int col = kingPos[1];
+
+            g2d.setColor(new Color(255, 30, 30, 70));
             g2d.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
     }
