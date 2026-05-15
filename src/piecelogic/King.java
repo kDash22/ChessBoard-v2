@@ -16,15 +16,6 @@ public class King extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
-
-        int targetCol = fileToCol(targetFile);
-        int targetRow = chessRowToRow(targetChessRow);
-
-        return false;
-    }
-
-    @Override
     public void moveCheck(ChessboardLogic chessboardLogic) {
         moveSet.clear();//clear the list to remove earlier move
 
@@ -106,6 +97,8 @@ public class King extends Piece{
             }
         }
 
+        filterIllegalMoves(chessboardLogic,moveSet);
+
         //implement checks
 
         int validMoveCount = moveSet.size();
@@ -114,6 +107,18 @@ public class King extends Piece{
         for (int i = 0; i < validMoveCount; i++){
             validMoveSet[i] = moveSet.get(i);
         }
+    }
+
+    @Override
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+
+        int targetCol = fileToCol(targetFile);
+        int targetRow = chessRowToRow(targetChessRow);
+
+        int row = Piece.chessRowToRow(getChessRow());
+        int col = Piece.fileToCol(getFile());
+
+        return (Math.abs(targetRow - row) <= 1 && Math.abs(targetCol-col) <= 1) && !(Math.abs(targetRow - row) == 0 && Math.abs(targetCol-col) == 0);
     }
 
     public void setHasMoved(boolean hasMoved) {

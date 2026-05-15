@@ -52,6 +52,9 @@ public class Knight extends Piece {
                 }
 
         }
+
+        filterIllegalMoves(chessboardLogic,moveSet);
+
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
 

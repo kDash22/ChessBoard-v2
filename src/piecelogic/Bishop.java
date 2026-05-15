@@ -55,6 +55,9 @@ public class Bishop extends Piece{
                 toCol += direction[1];
             }
         }
+
+        filterIllegalMoves(chessboardLogic,moveSet);
+
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
 

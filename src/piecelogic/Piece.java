@@ -133,6 +133,42 @@ public abstract class Piece {
 
     }
 
+    public void filterIllegalMoves(ChessboardLogic chessboardLogic, List<int[]> moveSet){
+
+        int row = chessRowToRow(getChessRow());
+        int col = fileToCol(getFile());
+
+        Piece[][] refBoard = chessboardLogic.getChessboard();
+
+        for (int i = moveSet.size()-1 ; i >= 0; i--){
+
+            int[] square = moveSet.get(i);
+            Piece captured = refBoard[ square[0] ][ square[1] ];
+
+            refBoard[ square[0] ][ square[1] ] = refBoard[row][col];
+            updateCoords(square[0],square[1]);
+            refBoard[row][col] = null;
+
+            chessboardLogic.setChessboard(refBoard);
+
+            if ( chessboardLogic.isKingInCheck(isWhite()) ){
+                moveSet.remove(i);
+            }
+
+            //undo move
+            // restore moving piece
+            refBoard[row][col] = refBoard[ square[0] ][ square[1] ];
+            updateCoords(row,col);
+
+            //restore captured
+            refBoard[ square[0] ][ square[1] ] = captured;
+
+            chessboardLogic.setChessboard(refBoard);
+
+        }
+
+    }
+
     public abstract boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow);
 
     public abstract void moveCheck(ChessboardLogic chessboardLogic);

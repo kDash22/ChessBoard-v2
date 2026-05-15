@@ -6,14 +6,18 @@ public class ChessboardLogic {
 
     protected ChessboardGui chessboardGui;
 
-    protected boolean whiteToMove = false;
+    private boolean whiteToMove ;
 
     protected Piece[][] chessboard = new Piece[8][8];//logical representation of the 8 x 8 board
+
+    private King wKing,bKing;
+
+    private boolean immediateAction = false;
 
     public ChessboardLogic(){
         System.out.println("chessboardLogic obj created ! ");
         chessboardGui = new ChessboardGui();
-        whiteToMove = true; //check this out later
+        whiteToMove = false; //check this out later
     }
     //setters
     public void setChessboard(Piece[][] board){
@@ -45,12 +49,22 @@ public class ChessboardLogic {
         int row = Piece.chessRowToRow(piece.getChessRow());
 
         this.chessboard[row][col] = piece;
+
+        if (piece instanceof King){
+
+            if (piece.isWhite()){
+                wKing = (King) piece;
+            } else {
+                bKing = (King) piece;
+            }
+        }
         //System.out.println("piece inserted into the board ! ");
     }
 
     public void newGame(){
 
         chessboardGui.setChessboardLogic(this);
+        setWhiteToMove(true);
 
         setChessboard(new Piece[8][8]);
 
@@ -88,12 +102,16 @@ public class ChessboardLogic {
     //for testing purposes
     public void customBoard(){
         chessboardGui.setChessboardLogic(this);
+        setWhiteToMove(true);
 
         Piece[][] emptyBoard = new Piece[8][8];
         setChessboard(emptyBoard);
 
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,true,this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,true,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,'e',1,false,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,'e',3,true,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,false,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,false,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,'d',7,true,this));
 
 
     }
@@ -115,7 +133,7 @@ public class ChessboardLogic {
 
             if (r == selectedToRow && c== selectedToCol){
 
-                // Castling Logic Execution
+                // Castling Execution Logic
                 if (movingPiece instanceof King && Math.abs(selectedCol - selectedToCol) == 2) {
                     int rookOriginalCol = (selectedToCol == 6) ? 7 : 0;
                     int rookTargetCol = (selectedToCol == 6) ? 5 : 3;
@@ -132,9 +150,41 @@ public class ChessboardLogic {
                     }
                 }
 
+                //EnPassant Execution Logic
+                if (immediateAction && movingPiece instanceof Pawn pawn){
+
+                    if (Math.abs(selectedCol - selectedToCol) == 1 && chessboard[selectedToRow][selectedToCol] == null ){
+                        int dir = pawn.isWhite() ? 1 : -1;
+                        chessboard[selectedToRow+dir][selectedToCol] = null;
+                    }
+                    immediateAction = false;
+
+                }
+
+                Pawn.clearAllEnPassantFlags(this);//resetting
+
+                //en passant available setting logic, must be after en passant execution logic
+                if (movingPiece instanceof Pawn pawn && Math.abs(selectedRow-selectedToRow) == 2){
+                    Piece pieceToTheLeft = null,pieceToTheRight = null;
+
+                    if (isSquareWithinBounds(selectedToRow,selectedToCol-1))
+                        pieceToTheLeft = chessboard[selectedToRow][selectedToCol-1];
+
+                    if (isSquareWithinBounds(selectedToRow,selectedToCol+1))
+                        pieceToTheRight = chessboard[selectedToRow][selectedToCol+1];
+
+
+                    if (pieceToTheLeft instanceof Pawn || pieceToTheRight instanceof Pawn){
+                        pawn.setEnPassantVulnerable(true);
+                        immediateAction = true;
+                    }
+
+                }
+
                 chessboard[selectedToRow][selectedToCol] = movingPiece;
                 chessboard[selectedRow][selectedCol] = null;
                 movingPiece.updateCoords(selectedToRow,selectedToCol);
+                setWhiteToMove(!whiteToMove);
             }
 
         }
@@ -166,5 +216,27 @@ public class ChessboardLogic {
         }
 
         return false;
+    }
+
+    public int[] getKingPos(boolean isWhite){
+
+        King king = isWhite ? wKing : bKing;
+
+        int row = Piece.chessRowToRow(king.getChessRow());
+        int col = Piece.fileToCol(king.getFile());
+
+        return new int[]{row,col};
+
+
+    }
+
+    public boolean isKingInCheck(boolean isWhite){
+
+        int[] kingPos = getKingPos(isWhite);
+
+        int row = Piece.rowToChessRow(kingPos[0]);
+        char col = Piece.colToFile(kingPos[1]);
+
+        return isSquareAttacked(!isWhite,col,row);
     }
 }
