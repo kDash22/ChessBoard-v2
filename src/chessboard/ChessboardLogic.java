@@ -17,7 +17,7 @@ public class ChessboardLogic {
     public ChessboardLogic(){
         System.out.println("chessboardLogic obj created ! ");
         chessboardGui = new ChessboardGui();
-        whiteToMove = false; //check this out later
+        whiteToMove = true;
     }
     //setters
     public void setChessboard(Piece[][] board){
