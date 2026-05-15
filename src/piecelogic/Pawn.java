@@ -2,6 +2,8 @@ package piecelogic;
 
 import chessboard.ChessboardLogic;
 
+import java.util.List;
+
 public class Pawn extends Piece{
 
     public static final int PIECE_VALUE = 1;
@@ -79,10 +81,29 @@ public class Pawn extends Piece{
             }
         }
 
+        //en passant logic start
+        Piece pieceToTheLeft = null,pieceToTheRight = null;
+
+        if (ChessboardLogic.isSquareWithinBounds(row,col-1))
+            pieceToTheLeft = refBoard[row][col-1];
+
+        if (ChessboardLogic.isSquareWithinBounds(row,col+1))
+            pieceToTheRight = refBoard[row][col+1];
+
+        if (pieceToTheLeft instanceof Pawn pawnToTheLeft && pawnToTheLeft.getEnPassantVulnerable()){
+            int dir = isWhite() ? -1 : 1;
+            int c = fileToCol(pawnToTheLeft.getFile());
+            moveSet.add(new int[]{row+dir,c});
+        }
+
+        if (pieceToTheRight instanceof Pawn pawnToTheRight && pawnToTheRight.getEnPassantVulnerable()){
+            int dir = isWhite() ? -1 : 1;
+            int c = fileToCol(pawnToTheRight.getFile());
+            moveSet.add(new int[]{row+dir,c});
+        }
+        //en passant logic over
+
         filterIllegalMoves(chessboardLogic,moveSet);
-
-
-        //implement en passant
 
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
@@ -105,6 +126,83 @@ public class Pawn extends Piece{
 
     }
 
+    public static void clearAllEnPassantFlags(ChessboardLogic chessboardLogic){
+
+        Piece[][] refBoard = chessboardLogic.getChessboard();
+
+        for (int r = 0; r < 8; r++){
+            for (int c = 0; c < 8; c++){
+
+                Piece p = refBoard[r][c];
+
+                if (p instanceof Pawn pawn){
+                    pawn.setEnPassantVulnerable(false);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void filterIllegalMoves(ChessboardLogic chessboardLogic, List<int[]> moveSet){
+
+        int row = chessRowToRow(getChessRow());
+        int col = fileToCol(getFile());
+
+        Piece[][] refBoard = chessboardLogic.getChessboard();
+
+        for (int i = moveSet.size()-1 ; i >= 0; i--){
+
+            int[] square = moveSet.get(i);
+
+            Piece captured;
+            boolean enPassantHappened = false;
+
+            if (Math.abs(col - square[1]) == 1 && refBoard[ square[0] ][ square[1] ] == null ){
+                int dir = isWhite() ? 1 : -1;
+                captured = refBoard[square[0]+dir][square[1]] ;
+
+                if (!(captured instanceof Pawn)){
+                    throw new IllegalArgumentException("The captured Piece using EnPassant is not a Pawn at filterIllegalMoves in Pawn ! ");
+                }
+
+                refBoard[square[0]+dir][square[1]] = null;
+                enPassantHappened = true;
+
+            } else {
+                captured = refBoard[ square[0] ][ square[1] ];
+            }
+
+
+            refBoard[ square[0] ][ square[1] ] = refBoard[row][col];
+            updateCoords(square[0],square[1]);
+            refBoard[row][col] = null;
+
+            chessboardLogic.setChessboard(refBoard);
+
+            if ( chessboardLogic.isKingInCheck(isWhite()) ){
+                moveSet.remove(i);
+            }
+
+            //undo move
+            // restore moving piece
+            refBoard[row][col] = refBoard[ square[0] ][ square[1] ];
+            updateCoords(row,col);
+
+            //restore captured
+            if (enPassantHappened){
+                int dir = isWhite() ? 1 : -1;
+                refBoard[square[0]+dir][square[1]] = captured ;
+                refBoard[ square[0] ][ square[1] ] = null;
+            } else {
+                refBoard[ square[0] ][ square[1] ] = captured;
+            }
+
+            chessboardLogic.setChessboard(refBoard);
+
+        }
+
+    }
+
     public boolean hasPawnMoved(){
         return originalChessRow != getChessRow() || originalFile != getFile();
     }
@@ -115,4 +213,9 @@ public class Pawn extends Piece{
         return tag;
     }
 
+    public void setEnPassantVulnerable(boolean enPassantVulnerable) {
+        this.enPassantVulnerable = enPassantVulnerable;
+    }
+
+    public boolean getEnPassantVulnerable(){return enPassantVulnerable;}
 }

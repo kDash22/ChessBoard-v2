@@ -12,6 +12,7 @@ public class ChessboardLogic {
 
     private King wKing,bKing;
 
+    private boolean immediateAction = false;
 
     public ChessboardLogic(){
         System.out.println("chessboardLogic obj created ! ");
@@ -132,7 +133,7 @@ public class ChessboardLogic {
 
             if (r == selectedToRow && c== selectedToCol){
 
-                // Castling Logic Execution
+                // Castling Execution Logic
                 if (movingPiece instanceof King && Math.abs(selectedCol - selectedToCol) == 2) {
                     int rookOriginalCol = (selectedToCol == 6) ? 7 : 0;
                     int rookTargetCol = (selectedToCol == 6) ? 5 : 3;
@@ -149,10 +150,40 @@ public class ChessboardLogic {
                     }
                 }
 
+                //EnPassant Execution Logic
+                if (immediateAction && movingPiece instanceof Pawn pawn){
+
+                    if (Math.abs(selectedCol - selectedToCol) == 1 && chessboard[selectedToRow][selectedToCol] == null ){
+                        int dir = pawn.isWhite() ? 1 : -1;
+                        chessboard[selectedToRow+dir][selectedToCol] = null;
+                    }
+                    immediateAction = false;
+
+                }
+
+                Pawn.clearAllEnPassantFlags(this);//resetting
+
+                //en passant available setting logic, must be after en passant execution logic
+                if (movingPiece instanceof Pawn pawn && Math.abs(selectedRow-selectedToRow) == 2){
+                    Piece pieceToTheLeft = null,pieceToTheRight = null;
+
+                    if (isSquareWithinBounds(selectedToRow,selectedToCol-1))
+                        pieceToTheLeft = chessboard[selectedToRow][selectedToCol-1];
+
+                    if (isSquareWithinBounds(selectedToRow,selectedToCol+1))
+                        pieceToTheRight = chessboard[selectedToRow][selectedToCol+1];
+
+
+                    if (pieceToTheLeft instanceof Pawn || pieceToTheRight instanceof Pawn){
+                        pawn.setEnPassantVulnerable(true);
+                        immediateAction = true;
+                    }
+
+                }
+
                 chessboard[selectedToRow][selectedToCol] = movingPiece;
                 chessboard[selectedRow][selectedCol] = null;
                 movingPiece.updateCoords(selectedToRow,selectedToCol);
-
                 setWhiteToMove(!whiteToMove);
             }
 
