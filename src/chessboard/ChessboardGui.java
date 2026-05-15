@@ -295,7 +295,7 @@ public class ChessboardGui extends JPanel {
             repaint();
         }
 
-        repaint();
+        //repaint();
         //System.out.println("is king in check : "+chessboardLogic.isKingInCheck(true));
     }
 

@@ -82,16 +82,27 @@ public class King extends Piece{
             if (remove) moveSet.remove(i);
         }
         // --- Castling Logic ---
-        if (!getHasMoved() /* && !ChessBoard.isKingInCheck(getIdentification().isWhite()) */ ) {
+        if (!getHasMoved()  && !chessboardLogic.isKingInCheck(isWhite())  ) {
             // King Side Castling
             if (refBoard[row][7] instanceof Rook rook && !rook.getHasMoved()) {
-                if (refBoard[row][5] == null && refBoard[row][6] == null) {
+                int chessRow = rowToChessRow(row);
+                char fileF = colToFile(5);
+                char fileG = colToFile(6);
+
+                if ( (refBoard[row][5] == null && refBoard[row][6] == null)
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileF,chessRow)
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileG,chessRow))  {
                     moveSet.add(new int[] {row, 6});
                 }
             }
             // Queen Side Castling
             if (refBoard[row][0] instanceof Rook rook && !rook.getHasMoved()) {
-                if (refBoard[row][1] == null && refBoard[row][2] == null && refBoard[row][3] == null) {
+                int chessRow = rowToChessRow(row);
+                char fileC = colToFile(2);
+                char fileD = colToFile(3);
+                if (refBoard[row][1] == null && refBoard[row][2] == null && refBoard[row][3] == null
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileC,chessRow)
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileD,chessRow)) {
                     moveSet.add(new int[] {row, 2});
                 }
             }
