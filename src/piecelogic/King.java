@@ -98,11 +98,9 @@ public class King extends Piece{
             // Queen Side Castling
             if (refBoard[row][0] instanceof Rook rook && !rook.getHasMoved()) {
                 int chessRow = rowToChessRow(row);
-                char fileB = colToFile(1);
                 char fileC = colToFile(2);
                 char fileD = colToFile(3);
                 if (refBoard[row][1] == null && refBoard[row][2] == null && refBoard[row][3] == null
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileB,chessRow)
                         && !chessboardLogic.isSquareAttacked(!isWhite(),fileC,chessRow)
                         && !chessboardLogic.isSquareAttacked(!isWhite(),fileD,chessRow)) {
                     moveSet.add(new int[] {row, 2});
