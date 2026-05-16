@@ -76,13 +76,13 @@ public class King extends Piece{
             if (remove) moveSet.remove(i);
         }
         // --- Castling Logic ---
-        if (!getHasMoved()  && !chessboardLogic.isKingInCheck(isWhite())  ) {
+        if (!getHasMoved()  && !chessboardLogic.isKingInCheck(isWhite(),refBoard)  ) {
             // King Side Castling
             if (refBoard[fromRow][7] instanceof Rook rook && !rook.getHasMoved()) {
 
                 if ( (refBoard[fromRow][5] == null && refBoard[fromRow  ][6] == null)
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fromRow,5)
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fromRow,6))  {
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),refBoard,fromRow,5)
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),refBoard,fromRow,6))  {
                     moveSet.add(new int[] {fromRow, 6});
                 }
             }
@@ -90,8 +90,8 @@ public class King extends Piece{
             if (refBoard[fromRow][0] instanceof Rook rook && !rook.getHasMoved()) {
                 
                 if (refBoard[fromRow][1] == null && refBoard[fromRow][2] == null && refBoard[fromRow][3] == null
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fromRow,2)
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fromRow,3)) {
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),refBoard,fromRow,2)
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),refBoard,fromRow,3)) {
                     moveSet.add(new int[] {fromRow, 2});
                 }
             }
@@ -110,7 +110,7 @@ public class King extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
+    public boolean attacksSquare(Piece[][] refBoard,int pieceRow, int pieceCol, int targetRow, int targetCol) {
         return (Math.abs(targetRow - pieceRow) <= 1 && Math.abs(targetCol-pieceCol) <= 1) && !(Math.abs(targetRow - pieceRow) == 0 && Math.abs(targetCol-pieceCol) == 0);
     }
 

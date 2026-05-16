@@ -4,6 +4,8 @@ import chessboard.ChessboardLogic;
 
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 public class Pawn extends Piece{
 
     public static final int PIECE_VALUE = 1;
@@ -105,7 +107,7 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
+    public boolean attacksSquare(Piece[][] refBoard, int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
         int rowDir = isWhite() ? -1 : 1;
 
@@ -163,7 +165,7 @@ public class Pawn extends Piece{
 
             chessboardLogic.setChessboard(refBoard);
 
-            if ( chessboardLogic.isKingInCheck(isWhite()) ){
+            if ( chessboardLogic.isKingInCheck(isWhite(),refBoard) ){
                 moveSet.remove(i);
             }
 
@@ -185,6 +187,41 @@ public class Pawn extends Piece{
         }
 
     }
+
+    public Piece promote(ChessboardLogic chessboardLogic){
+
+        Piece newPiece;
+
+        String[] options = { //promotion options
+                    "Knight",
+                    "Bishop",
+                    "Rook",
+                    "Queen",
+        };
+
+        int choice = JOptionPane.showOptionDialog(//the message box to choose which promotion happens
+                null,                    
+                "Choose the promotion:",
+                "Promotion",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[3]//default is queen
+        );
+        
+
+        switch (choice){ //the promotions
+            case 0 -> newPiece = PieceFactory.createPiece(PieceType.KNIGHT, isWhite());
+            case 1 -> newPiece = PieceFactory.createPiece(PieceType.BISHOP, isWhite());
+            case 2 -> newPiece = PieceFactory.createPiece(PieceType.ROOK, isWhite());
+            case 3 -> newPiece = PieceFactory.createPiece(PieceType.QUEEN, isWhite());
+            default -> newPiece = PieceFactory.createPiece(PieceType.QUEEN, isWhite());
+        }        
+
+        return newPiece;    
+    }
+
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
     }   

@@ -98,6 +98,7 @@ public class ChessboardLogic {
         insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,false),'e',4);
         insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,false),'e',5);
         insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,true),'d',7);
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, true), 'a', 7);
 
 
     }
@@ -192,21 +193,36 @@ public class ChessboardLogic {
             }
         }
 
-        if (movingPiece instanceof Pawn pawn && !pawn.getHasMoved()) {
-            pawn.setHasMoved(true);
+        if (movingPiece instanceof Pawn pawn) {
+
+            if (!pawn.getHasMoved()) {
+                pawn.setHasMoved(true);
+            }
+
+            int endRow = pawn.isWhite() ? 0 : 7;
+
+            char file = colToFile(selectedToCol);
+            int rank = rowToChessRow(endRow);
+            
+            if (pawn.isWhite() && selectedToRow == endRow) {
+                insertPieceToBoard(pawn.promote(this), file, rank);
+            } else if (!pawn.isWhite() && selectedToRow == endRow) {
+                insertPieceToBoard(pawn.promote(this), file, rank);
+            }
+            
         }
     }
 
     //a method to check if a square is attacked by a specified color
-    public boolean isSquareAttacked(boolean attackerIsWhite, int row, int col){
+    public boolean isSquareAttacked(boolean attackerIsWhite, Piece[][] refBoard, int row, int col){
 
         for (int pieceRow = 0; pieceRow < 8; pieceRow++){
             for (int pieceCol = 0; pieceCol < 8; pieceCol++ ){
 
-                Piece piece = chessboard[pieceRow][pieceCol];
+                Piece piece = refBoard[pieceRow][pieceCol];
                 if (piece != null &&
                         piece.isWhite() == attackerIsWhite &&
-                        piece.attacksSquare(this, pieceRow, pieceCol, row, col)) {
+                        piece.attacksSquare(refBoard, pieceRow, pieceCol, row, col)) {
 
                     return true;
                 }
@@ -217,19 +233,26 @@ public class ChessboardLogic {
         return false;
     }
 
-    public int[] getKingPos(boolean isWhite){
+    public int[] getKingPos(boolean isWhite, Piece[][] chessboard){
 
-        int row = isWhite ? wKingRow : bKingRow;
-        int col = isWhite ? wKingCol : bKingCol;
+        for (int row = 0; row < 8; row++){
+            for (int col = 0; col < 8; col++){
 
-        return new int[]{row,col};
+                Piece piece = chessboard[row][col];
 
+                if (piece instanceof King king && king.isWhite() == isWhite){
+                    return new int[]{row,col};
+                }
+
+            }
+        }
+        throw new IllegalStateException("No king found for color : "+ (isWhite ? "white" : "black") );
     }
 
-    public boolean isKingInCheck(boolean isWhite){
+    public boolean isKingInCheck(boolean isWhite, Piece[][] chessboard){
 
-        int[] kingPos = getKingPos(isWhite);
-        return isSquareAttacked(!isWhite,kingPos[0],kingPos[1]);
+        int[] kingPos = getKingPos(isWhite, chessboard);
+        return isSquareAttacked(!isWhite, chessboard, kingPos[0], kingPos[1]);
     }
 
     private void setupBackRank(boolean isWhite, int rank) {

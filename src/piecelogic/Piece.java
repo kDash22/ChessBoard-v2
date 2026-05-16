@@ -52,12 +52,22 @@ public abstract class Piece {
             refBoard = copyBoard(chessboardLogic.getChessboard());
 
             int[] square = moveSet.get(i);
-            Piece captured = refBoard[ square[0] ][ square[1] ];
 
             refBoard[ square[0] ][ square[1] ] = refBoard[fromRow][fromCol];
             refBoard[fromRow][fromCol] = null;
 
-            if ( chessboardLogic.isKingInCheck(isWhite()) ){
+            if (this instanceof King && Math.abs(fromCol - square[1]) == 2){
+                //handle castling move for king
+
+                int rookFromCol = (square[1] == 6) ? 7 : 0;
+                int rookToCol = (square[1] == 6) ? 5 : 3;
+
+                refBoard[square[0]][rookToCol] = refBoard[square[0]][rookFromCol];
+                refBoard[square[0]][rookFromCol] = null;
+            }
+
+
+            if ( chessboardLogic.isKingInCheck(isWhite(),refBoard) ){
                 moveSet.remove(i);
             }
 
@@ -65,7 +75,7 @@ public abstract class Piece {
 
     }
 
-    public abstract boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol);
+    public abstract boolean attacksSquare(Piece[][] refBoard,int pieceRow, int pieceCol, int targetRow, int targetCol);
 
     public abstract void moveCheck(ChessboardLogic chessboardLogic, int fromRow, int fromCol);
 }

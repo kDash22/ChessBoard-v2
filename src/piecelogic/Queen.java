@@ -60,14 +60,14 @@ public class Queen extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
+    public boolean attacksSquare(Piece[][] refBoard, int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
         Bishop bishopLogic = new Bishop(isWhite());
 
         Rook rookLogic = new Rook(isWhite());
 
-        return bishopLogic.attacksSquare(chessboardLogic,pieceRow, pieceCol, targetRow, targetCol)
-                || rookLogic.attacksSquare(chessboardLogic,pieceRow, pieceCol, targetRow, targetCol);
+        return bishopLogic.attacksSquare(refBoard, pieceRow, pieceCol, targetRow, targetCol)
+                || rookLogic.attacksSquare(refBoard, pieceRow, pieceCol, targetRow, targetCol);
     }
 
     public String toString(){

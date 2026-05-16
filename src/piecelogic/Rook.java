@@ -62,7 +62,7 @@ public class Rook extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
+    public boolean attacksSquare(Piece[][] refBoard, int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
         if (targetRow != pieceRow && targetCol != pieceCol)
             return false;
@@ -75,7 +75,7 @@ public class Rook extends Piece{
 
         while (targetCol != c || targetRow != r){
 
-            if (chessboardLogic.getChessboard()[r][c] != null){
+            if (refBoard[r][c] != null){
                 return false;
 
             }

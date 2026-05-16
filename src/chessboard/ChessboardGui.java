@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 
 import global.Global;
 import piecelogic.*;
@@ -220,17 +221,6 @@ public class ChessboardGui extends JPanel {
             return;
         }
 
-        /*
-        int chessRow = Piece.rowToChessRow(row);
-        char file = Piece.colToFile(col);
-
-        System.out.println("Is "+file+chessRow+" attacked : "+chessboardLogic.isSquareAttacked(true,file,chessRow));
-        int[] kingPos = chessboardLogic.getKingPos(true);
-
-        System.out.println("\nwhite king pos"+Piece.colToFile(kingPos[1])+Piece.rowToChessRow(kingPos[0]));
-
-         */
-
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
         //if a piece is already selected
@@ -358,22 +348,24 @@ public class ChessboardGui extends JPanel {
     private void highlightCheckedKing(Graphics2D g2d){
 
         boolean whiteToMove = chessboardLogic.isWhiteToMove();
+        Piece[][] refBoard = chessboardLogic.getChessboard();
 
-        if (chessboardLogic.isKingInCheck(whiteToMove)){
-            int[] kingPos = chessboardLogic.getKingPos(whiteToMove);
+        if (chessboardLogic.isKingInCheck(whiteToMove, refBoard)){
+            int[] kingPos = chessboardLogic.getKingPos(whiteToMove, refBoard);
             int row = kingPos[0];
             int col = kingPos[1];
 
             g2d.setColor(new Color(255, 30, 30, 70));
             g2d.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
-    }
+    }       
 
     public static void main(String[] args){
 
         javax.swing.SwingUtilities.invokeLater(() -> {
             ChessboardLogic chessboardLogic = new ChessboardLogic();
-            chessboardLogic.newGame();
+            //chessboardLogic.newGame();
+            chessboardLogic.customBoard();
             chessboardLogic.getChessboardGui().showGame();
         });
 

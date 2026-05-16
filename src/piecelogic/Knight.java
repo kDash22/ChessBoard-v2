@@ -64,7 +64,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
+    public boolean attacksSquare(Piece[][] refBoard, int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
         int rowDiff = Math.abs(targetRow - pieceRow);
         int colDiff = Math.abs(targetCol - pieceCol);

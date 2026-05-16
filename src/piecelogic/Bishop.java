@@ -61,7 +61,7 @@ public class Bishop extends Piece{
 
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
+    public boolean attacksSquare(Piece[][] refBoard,int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
         if (Math.abs(targetRow - pieceRow) != Math.abs(targetCol - pieceCol))
             return false;
@@ -76,7 +76,7 @@ public class Bishop extends Piece{
 
             if (!ChessboardLogic.isIndexWithinBounds(r, c)) return false;
 
-            if (chessboardLogic.getChessboard()[r][c] != null) return false;
+            if (refBoard[r][c] != null) return false;
 
             r += rowDir;
             c += colDir;
