@@ -144,6 +144,9 @@ public class ChessboardGui extends JPanel {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece piece = chessboardLogic.chessboard[row][col];
+
+                if (piece == null) continue;
+
                 Image pieceIcon = getPieceImage(piece);
 
                 if (pieceIcon != null) {
@@ -165,7 +168,7 @@ public class ChessboardGui extends JPanel {
         if (selectedRow != -1 && selectedCol != -1) {
             Piece selected = chessboardLogic.chessboard[selectedRow][selectedCol];
             if (selected != null) {
-                highlightSquare(g2d, selected);
+                highlightSquare(g2d, selected, selectedRow , selectedCol);
 
                 g2d.setColor(new Color(148,224,224,90));
                 g2d.fillRect(selectedCol * TILE_SIZE, selectedRow * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -246,6 +249,7 @@ public class ChessboardGui extends JPanel {
                     return;
                 }
 
+                //switch piece
                 if (refBoard[row][col].isWhite() == refBoard[selectedRow][selectedCol].isWhite()){
                     selectedRow = row;
                     selectedCol = col;
@@ -322,12 +326,14 @@ public class ChessboardGui extends JPanel {
 
     }
 
-    public void highlightSquare(Graphics2D g2d, Piece piece){
+    //this must only run after a selection is made, otherwise it will throw a null pointer exception
+    public void highlightSquare(Graphics2D g2d, Piece piece, int selectedRow, int selectedCol){
 
         if (piece == null) return;
 
-        //check on this
-        piece.moveCheck(chessboardLogic);
+        if (!pieceSelected) return;
+
+        piece.moveCheck(chessboardLogic,selectedRow,selectedCol);
         int[][] moveSet = piece.getValidMoveSet();
         Global.printValidMoveSet(moveSet);
 
@@ -365,13 +371,16 @@ public class ChessboardGui extends JPanel {
 
     public static void main(String[] args){
 
-        ChessboardLogic chessboardLogic = new ChessboardLogic();
-        chessboardLogic.newGame();
-        //chessboardLogic.customBoard(); // used for testing and debugging
-        chessboardLogic.getChessboardGui().showGame();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            ChessboardLogic chessboardLogic = new ChessboardLogic();
+            chessboardLogic.newGame();
+            chessboardLogic.getChessboardGui().showGame();
+        });
+
         System.out.println();
         System.out.println();
 
+        /*
         for (int row = 0; row < 8; row++){
             for (int col = 0; col < 8; col++){
                 Piece piece = chessboardLogic.chessboard[row][col];
@@ -382,6 +391,7 @@ public class ChessboardGui extends JPanel {
                 }
             }
         }
+            */
     }
 
 }

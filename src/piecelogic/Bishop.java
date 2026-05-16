@@ -7,16 +7,12 @@ public class Bishop extends Piece{
     public static final int PIECE_VALUE = 3;
     private boolean check = false;
 
-    public Bishop(char file, int chessRow, boolean isWhite){
-        super(isWhite,PieceType.BISHOP,file,chessRow);
-
-        setFile(file);
-        setChessRow(chessRow);
-
+    public Bishop(boolean isWhite) {
+        super(PieceType.BISHOP, isWhite);
     }
 
     @Override
-    public void moveCheck(ChessboardLogic chessboardLogic) {
+    public void moveCheck(ChessboardLogic chessboardLogic, int fromRow, int fromCol) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -29,14 +25,11 @@ public class Bishop extends Piece{
         //a bishop can move in 4 directions
         int[][] directions = {{1,1},{-1,1},{-1,-1},{1,-1}};
 
-        int col = fileToCol(getFile());
-        int row = chessRowToRow(getChessRow());
-
         for (int[] direction : directions){
-            int toRow = row + direction[0];
-            int toCol = col + direction[1];
+            int toRow = fromRow + direction[0];
+            int toCol = fromCol + direction[1];
 
-            while(ChessboardLogic.isSquareWithinBounds(toRow,toCol)){
+            while(ChessboardLogic.isIndexWithinBounds(toRow,toCol)){
 
                 if (refBoard[toRow][toCol] == null){
                     moveSet.add(new int[]{toRow, toCol});
@@ -56,7 +49,7 @@ public class Bishop extends Piece{
             }
         }
 
-        filterIllegalMoves(chessboardLogic,moveSet);
+        filterIllegalMoves(chessboardLogic,moveSet, fromRow, fromCol);
 
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
@@ -68,26 +61,20 @@ public class Bishop extends Piece{
 
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
-        int targetCol = fileToCol(targetFile);
-        int targetRow = chessRowToRow(targetChessRow);
-
-        int row = chessRowToRow(getChessRow());
-        int col = fileToCol(getFile());
-
-        if (Math.abs(targetRow - row) != Math.abs(targetCol - col))
+        if (Math.abs(targetRow - pieceRow) != Math.abs(targetCol - pieceCol))
             return false;
 
-        int rowDir = (targetRow > row) ? 1 : -1;
-        int colDir = (targetCol > col) ? 1 : -1;
+        int rowDir = (targetRow > pieceRow) ? 1 : -1;
+        int colDir = (targetCol > pieceCol) ? 1 : -1;
 
-        int r = row+rowDir;
-        int c = col+colDir;
+        int r = pieceRow+rowDir;
+        int c = pieceCol+colDir;
 
         while (r != targetRow && c != targetCol){
 
-            if (!ChessboardLogic.isSquareWithinBounds(r, c)) return false;
+            if (!ChessboardLogic.isIndexWithinBounds(r, c)) return false;
 
             if (chessboardLogic.getChessboard()[r][c] != null) return false;
 
@@ -99,8 +86,8 @@ public class Bishop extends Piece{
     }
 
     public String toString(){
-        String tag = isWhite() ? "White Bishop at " : "Black Bishop at ";
-        tag += getFile()+""+getChessRow();
+        String tag = isWhite() ? "White Bishop" : "Black Bishop";
+        //tag += getFile()+""+getChessRow();
         return tag;
     }
 }

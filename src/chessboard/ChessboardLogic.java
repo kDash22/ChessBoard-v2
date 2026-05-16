@@ -1,5 +1,7 @@
 package chessboard;
 
+import java.util.List;
+
 import piecelogic.*;
 
 public class ChessboardLogic {
@@ -10,7 +12,9 @@ public class ChessboardLogic {
 
     protected Piece[][] chessboard = new Piece[8][8];//logical representation of the 8 x 8 board
 
-    private King wKing,bKing;
+    private int wKingRow,wKingCol,bKingRow,bKingCol;
+    
+    public static final List<Character> COLUMN_LETTERS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
 
     private boolean immediateAction = false;
 
@@ -44,18 +48,19 @@ public class ChessboardLogic {
         return whiteToMove;
     }
 
-    public void insertPieceToBoard(Piece piece){
-        int col = Piece.fileToCol(piece.getFile());
-        int row = Piece.chessRowToRow(piece.getChessRow());
+    public void insertPieceToBoard(Piece piece, char file, int chessRow){
+        int col = fileToCol(file);
+        int row = chessRowToRow(chessRow);
 
         this.chessboard[row][col] = piece;
 
-        if (piece instanceof King){
-
-            if (piece.isWhite()){
-                wKing = (King) piece;
+        if (piece instanceof King king ) {
+            if (king.isWhite()) {
+                wKingRow = row;
+                wKingCol = col;
             } else {
-                bKing = (King) piece;
+                bKingRow = row;
+                bKingCol = col;
             }
         }
         //System.out.println("piece inserted into the board ! ");
@@ -67,36 +72,17 @@ public class ChessboardLogic {
         setWhiteToMove(true);
 
         setChessboard(new Piece[8][8]);
+        
+        // white
+        setupBackRank(true, 1);
+        setupPawns(true, 2);
 
-        // white pieces
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.ROOK,   'a', 1, true, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT, 'b', 1, true, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP, 'c', 1, true, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,  'd', 1, true, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,   'e', 1, true, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP, 'f', 1, true, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT, 'g', 1, true, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.ROOK,   'h', 1, true, this));
-
-        for (char f = 'a'; f <= 'h'; f++) {
-            insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, f, 2, true, this));
-        }
-
-        // black pieces
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.ROOK,   'a', 8, false, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT, 'b', 8, false, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP, 'c', 8, false, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,  'd', 8, false, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,   'e', 8, false, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP, 'f', 8, false, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT, 'g', 8, false, this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.ROOK,   'h', 8, false, this));
-
-        for (char f = 'a'; f <= 'h'; f++) {
-            insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, f, 7, false, this));
-        }
+        // black
+        setupBackRank(false, 8);
+        setupPawns(false, 7);
 
         System.out.println("Chessboard.newGame() was called!");
+
     }
 
     //for testing purposes
@@ -107,16 +93,16 @@ public class ChessboardLogic {
         Piece[][] emptyBoard = new Piece[8][8];
         setChessboard(emptyBoard);
 
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,'e',1,false,this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,'e',3,true,this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,'e',4,false,this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,'e',5,false,this));
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,'d',7,true,this));
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,false),'e',1);
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KING,true),'e',3);
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,false),'e',4);
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,false),'e',5);
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,true),'d',7);
 
 
     }
 
-    public static boolean isSquareWithinBounds(int row, int col){
+    public static boolean isIndexWithinBounds(int row, int col){
         return row < 8 && col < 8 && row >= 0 && col >= 0;
     }
 
@@ -142,11 +128,9 @@ public class ChessboardLogic {
 
                     if (rook instanceof Rook) {
 
-                        rook.setFile(Piece.colToFile(rookTargetCol));
                         ((Rook) rook).setHasMoved(true);
                         chessboard[selectedRow][rookTargetCol] = rook;
                         chessboard[selectedRow][rookOriginalCol] = null;
-                        rook.updateCoords(selectedRow,rookTargetCol);
                     }
                 }
 
@@ -167,10 +151,10 @@ public class ChessboardLogic {
                 if (movingPiece instanceof Pawn pawn && Math.abs(selectedRow-selectedToRow) == 2){
                     Piece pieceToTheLeft = null,pieceToTheRight = null;
 
-                    if (isSquareWithinBounds(selectedToRow,selectedToCol-1))
+                    if (isIndexWithinBounds(selectedToRow,selectedToCol-1))
                         pieceToTheLeft = chessboard[selectedToRow][selectedToCol-1];
 
-                    if (isSquareWithinBounds(selectedToRow,selectedToCol+1))
+                    if (isIndexWithinBounds(selectedToRow,selectedToCol+1))
                         pieceToTheRight = chessboard[selectedToRow][selectedToCol+1];
 
 
@@ -183,32 +167,46 @@ public class ChessboardLogic {
 
                 chessboard[selectedToRow][selectedToCol] = movingPiece;
                 chessboard[selectedRow][selectedCol] = null;
-                movingPiece.updateCoords(selectedToRow,selectedToCol);
                 setWhiteToMove(!whiteToMove);
                 checkGameOver();
             }
 
         }
 
-        if(movingPiece instanceof Rook && !((Rook) movingPiece).getHasMoved()){
-                ((Rook) movingPiece).setHasMoved(true);
+        if(movingPiece instanceof Rook rook && !rook.getHasMoved()){
+                rook.setHasMoved(true);
         }
 
-        if(movingPiece instanceof King && !((King) movingPiece).getHasMoved()){
-                ((King) movingPiece).setHasMoved(true);
+        if(movingPiece instanceof King king ){
+
+            if (!king.getHasMoved()) {
+                king.setHasMoved(true);
+            }
+                
+            if (king.isWhite()) {
+                wKingCol = selectedToCol;
+                wKingRow = selectedToRow;
+            } else {
+                bKingCol = selectedToCol;
+                bKingRow = selectedToRow;
+            }
+        }
+
+        if (movingPiece instanceof Pawn pawn && !pawn.getHasMoved()) {
+            pawn.setHasMoved(true);
         }
     }
 
     //a method to check if a square is attacked by a specified color
-    public boolean isSquareAttacked(boolean attackerIsWhite, char file, int chessRow){
+    public boolean isSquareAttacked(boolean attackerIsWhite, int row, int col){
 
-        for (int r = 0; r < 8; r++){
-            for (int c = 0; c < 8; c++ ){
+        for (int pieceRow = 0; pieceRow < 8; pieceRow++){
+            for (int pieceCol = 0; pieceCol < 8; pieceCol++ ){
 
-                Piece piece = chessboard[r][c];
+                Piece piece = chessboard[pieceRow][pieceCol];
                 if (piece != null &&
                         piece.isWhite() == attackerIsWhite &&
-                        piece.attacksSquare(this, file, chessRow)){
+                        piece.attacksSquare(this, pieceRow, pieceCol, row, col)) {
 
                     return true;
                 }
@@ -221,24 +219,50 @@ public class ChessboardLogic {
 
     public int[] getKingPos(boolean isWhite){
 
-        King king = isWhite ? wKing : bKing;
-
-        int row = Piece.chessRowToRow(king.getChessRow());
-        int col = Piece.fileToCol(king.getFile());
+        int row = isWhite ? wKingRow : bKingRow;
+        int col = isWhite ? wKingCol : bKingCol;
 
         return new int[]{row,col};
-
 
     }
 
     public boolean isKingInCheck(boolean isWhite){
 
         int[] kingPos = getKingPos(isWhite);
+        return isSquareAttacked(!isWhite,kingPos[0],kingPos[1]);
+    }
 
-        int row = Piece.rowToChessRow(kingPos[0]);
-        char col = Piece.colToFile(kingPos[1]);
+    private void setupBackRank(boolean isWhite, int rank) {
+        PieceType[] order = {
+                PieceType.ROOK,
+                PieceType.KNIGHT,
+                PieceType.BISHOP,
+                PieceType.QUEEN,
+                PieceType.KING,
+                PieceType.BISHOP,
+                PieceType.KNIGHT,
+                PieceType.ROOK
+        };
 
-        return isSquareAttacked(!isWhite,col,row);
+        char file = 'a';
+        for (PieceType type : order) {
+            insertPieceToBoard(
+                    PieceFactory.createPiece(type,isWhite),
+                    file,
+                    rank
+            );
+            file++;
+        }
+    }
+
+    private void setupPawns(boolean isWhite, int rank) {
+        for (char file = 'a'; file <= 'h'; file++) {
+            insertPieceToBoard(
+                    PieceFactory.createPiece(PieceType.PAWN, isWhite),
+                    file,
+                    rank
+            );
+        }
     }
 
     public boolean checkGameOver(){
@@ -256,6 +280,7 @@ public class ChessboardLogic {
                 if (chessboard[row][col].isWhite() != whiteToMove) continue;
 
                 Piece piece = chessboard[row][col];
+                piece.moveCheck(this,row,col);
                 int moveCount = piece.getValidMoveSet().length;
                 System.out.print(moveCount);
                 validMoveCount = validMoveCount + moveCount;
@@ -271,5 +296,36 @@ public class ChessboardLogic {
         System.out.println(state+"\n");
 
         return isGameOver;
+    }
+
+    // a method used to convert column letter into int to be used in arrays
+    public static int fileToCol(Character file) {
+        if (!COLUMN_LETTERS.contains(file)) {
+            throw new IllegalArgumentException(" COLUMN LETTER NOT VALID ! : " + file);
+        }
+        return (file - 'a');
+    }
+
+    // a method used to convert array col number to chess column number
+    public static char colToFile(int col) {
+        if (col > 7 || col < 0)
+            throw new IllegalArgumentException(" Array Column number must be between 0 and 7 ! :" + col);
+        return (char) ('a' + col);
+    }
+
+    // a method used to convert chess rows into int to be used in arrays
+    public static int chessRowToRow(int chessRow) {
+        if (chessRow < 1 || chessRow > 8) {
+            throw new IllegalArgumentException("chessRow must be between 1 and 8: " + chessRow);
+        }
+        return 8 - chessRow;
+    }
+
+    // a method used to convert chess rows into int to be used in arrays
+    public static int rowToChessRow(int row) {
+        if (row < 0 || row > 7) {
+            throw new IllegalArgumentException("Array row number must be between 0 and 7: " + row);
+        }
+        return 8 - row;
     }
 }

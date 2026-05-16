@@ -2,6 +2,8 @@ package global;
 
 import piecelogic.Piece;
 
+import static chessboard.ChessboardLogic.*;
+
 public class Global {
 
     public static void print2D(Object[][] arr) {
@@ -29,8 +31,8 @@ public class Global {
             return;
         }
         for (int[] move : arr){
-            int chessRow = Piece.rowToChessRow(move[0]);
-            char chessCol = Piece.colToFile(move[1]);
+            int chessRow = rowToChessRow(move[0]);
+            char chessCol = colToFile(move[1]);
             System.out.println("move : "+chessCol+chessRow);
         }
         System.out.println();
@@ -63,5 +65,14 @@ public class Global {
         System.out.println();
     }
 
+    public static Piece[][] copyBoard(Piece[][] board) {
+        Piece[][] copy = new Piece[8][8];
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                copy[r][c] = board[r][c]; // shallow piece ref is OK if immutable
+            }
+        }
+        return copy;
+    }
 
 }

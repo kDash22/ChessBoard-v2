@@ -7,16 +7,12 @@ public class Queen extends Piece{
     public static final int PIECE_VALUE = 9;
     private boolean check = false;
 
-    public Queen(char file, int chessRow, boolean isWhite){
-        super(isWhite,PieceType.QUEEN,file,chessRow);
-
-        setFile(file);
-        setChessRow(chessRow);
-
+    public Queen(boolean isWhite) {
+        super(PieceType.QUEEN, isWhite);
     }
 
     @Override
-    public void moveCheck(ChessboardLogic chessboardLogic) {
+    public void moveCheck(ChessboardLogic chessboardLogic, int fromRow, int fromCol) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -29,14 +25,11 @@ public class Queen extends Piece{
         //a Queen can move in 8 directions
         int[][] directions = {{1,0},{1,1},{0,1},{-1,1},{-1,0},{-1,-1},{0,-1},{1,-1}};
 
-        int col = fileToCol(getFile());
-        int row = chessRowToRow(getChessRow());
-
         for (int[] direction : directions){
-            int toRow = row + direction[0];
-            int toCol = col + direction[1];
+            int toRow = fromRow + direction[0];
+            int toCol = fromCol + direction[1];
 
-            while( ChessboardLogic.isSquareWithinBounds(toRow,toCol) ){
+            while( ChessboardLogic.isIndexWithinBounds(toRow,toCol) ){
 
                 if (refBoard[toRow][toCol] == null){
                     moveSet.add(new int[]{toRow, toCol});
@@ -56,7 +49,7 @@ public class Queen extends Piece{
             }
         }
 
-        filterIllegalMoves(chessboardLogic,moveSet);
+        filterIllegalMoves(chessboardLogic,moveSet, fromRow, fromCol);
 
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
@@ -67,19 +60,19 @@ public class Queen extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
-        Bishop bishopLogic = new Bishop(getFile(),getChessRow(),isWhite());
+        Bishop bishopLogic = new Bishop(isWhite());
 
-        Rook rookLogic = new Rook(getFile(),getChessRow(),isWhite());
+        Rook rookLogic = new Rook(isWhite());
 
-        return bishopLogic.attacksSquare(chessboardLogic, targetFile,targetChessRow)
-                || rookLogic.attacksSquare(chessboardLogic,targetFile,targetChessRow);
+        return bishopLogic.attacksSquare(chessboardLogic,pieceRow, pieceCol, targetRow, targetCol)
+                || rookLogic.attacksSquare(chessboardLogic,pieceRow, pieceCol, targetRow, targetCol);
     }
 
     public String toString(){
-        String tag = isWhite() ? "White Queen at " : "Black Queen at ";
-        tag += getFile()+""+getChessRow();
+        String tag = isWhite() ? "White Queen" : "Black Queen";
+        //tag += getFile()+""+getChessRow();
         return tag;
     }
 }

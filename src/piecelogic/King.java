@@ -8,24 +8,18 @@ public class King extends Piece{
 
     private boolean hasMoved = false;
 
-    public King(char file, int chessRow, boolean isWhite){
-        super(isWhite,PieceType.KING,file,chessRow);
-
-        setFile(file);
-        setChessRow(chessRow);
+    public King(boolean isWhite) {
+        super(PieceType.KING, isWhite);
     }
 
     @Override
-    public void moveCheck(ChessboardLogic chessboardLogic) {
+    public void moveCheck(ChessboardLogic chessboardLogic, int fromRow, int fromCol) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
             validMoveSet = new int[0][2];
             return;
         }
-
-        int row = chessRowToRow(getChessRow());
-        int col = fileToCol(getFile());
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
@@ -34,10 +28,10 @@ public class King extends Piece{
 
         for (int[] direction : directions){
 
-            int toRow = row + direction[0];
-            int toCol = col + direction[1];
+            int toRow = fromRow + direction[0];
+            int toCol = fromCol + direction[1];
 
-            if (ChessboardLogic.isSquareWithinBounds(toRow,toCol)){
+            if (ChessboardLogic.isIndexWithinBounds(toRow,toCol)){
                 if (refBoard[toRow][toCol] == null) {
                     // Empty square
                     moveSet.add(new int[]{toRow,toCol});
@@ -68,7 +62,7 @@ public class King extends Piece{
                     int adjRow = move[0] + dr;
                     int adjCol = move[1] + dc;
 
-                    if (ChessboardLogic.isSquareWithinBounds(adjRow, adjCol)) {
+                    if (ChessboardLogic.isIndexWithinBounds(adjRow, adjCol)) {
                         Piece adjPiece = refBoard[adjRow][adjCol];
                         if (adjPiece instanceof King && adjPiece.isWhite() != isWhite()) {
                             remove = true;
@@ -84,31 +78,26 @@ public class King extends Piece{
         // --- Castling Logic ---
         if (!getHasMoved()  && !chessboardLogic.isKingInCheck(isWhite())  ) {
             // King Side Castling
-            if (refBoard[row][7] instanceof Rook rook && !rook.getHasMoved()) {
-                int chessRow = rowToChessRow(row);
-                char fileF = colToFile(5);
-                char fileG = colToFile(6);
+            if (refBoard[fromRow][7] instanceof Rook rook && !rook.getHasMoved()) {
 
-                if ( (refBoard[row][5] == null && refBoard[row][6] == null)
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileF,chessRow)
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileG,chessRow))  {
-                    moveSet.add(new int[] {row, 6});
+                if ( (refBoard[fromRow][5] == null && refBoard[fromRow  ][6] == null)
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),fromRow,5)
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),fromRow,6))  {
+                    moveSet.add(new int[] {fromRow, 6});
                 }
             }
             // Queen Side Castling
-            if (refBoard[row][0] instanceof Rook rook && !rook.getHasMoved()) {
-                int chessRow = rowToChessRow(row);
-                char fileC = colToFile(2);
-                char fileD = colToFile(3);
-                if (refBoard[row][1] == null && refBoard[row][2] == null && refBoard[row][3] == null
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileC,chessRow)
-                        && !chessboardLogic.isSquareAttacked(!isWhite(),fileD,chessRow)) {
-                    moveSet.add(new int[] {row, 2});
+            if (refBoard[fromRow][0] instanceof Rook rook && !rook.getHasMoved()) {
+                
+                if (refBoard[fromRow][1] == null && refBoard[fromRow][2] == null && refBoard[fromRow][3] == null
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),fromRow,2)
+                        && !chessboardLogic.isSquareAttacked(!isWhite(),fromRow,3)) {
+                    moveSet.add(new int[] {fromRow, 2});
                 }
             }
         }
 
-        filterIllegalMoves(chessboardLogic,moveSet);
+        filterIllegalMoves(chessboardLogic,moveSet, fromRow, fromCol);
 
         //implement checks
 
@@ -121,15 +110,8 @@ public class King extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
-
-        int targetCol = fileToCol(targetFile);
-        int targetRow = chessRowToRow(targetChessRow);
-
-        int row = Piece.chessRowToRow(getChessRow());
-        int col = Piece.fileToCol(getFile());
-
-        return (Math.abs(targetRow - row) <= 1 && Math.abs(targetCol-col) <= 1) && !(Math.abs(targetRow - row) == 0 && Math.abs(targetCol-col) == 0);
+    public boolean attacksSquare(ChessboardLogic chessboardLogic,int pieceRow, int pieceCol, int targetRow, int targetCol) {
+        return (Math.abs(targetRow - pieceRow) <= 1 && Math.abs(targetCol-pieceCol) <= 1) && !(Math.abs(targetRow - pieceRow) == 0 && Math.abs(targetCol-pieceCol) == 0);
     }
 
     public void setHasMoved(boolean hasMoved) {
@@ -141,8 +123,8 @@ public class King extends Piece{
     }
 
     public String toString(){
-        String tag = isWhite() ? "White King at " : "Black King at ";
-        tag += getFile()+""+getChessRow();
+        String tag = isWhite() ? "White King" : "Black King";
+        //tag += getFile()+""+getChessRow();
         return tag;
     }
 }
