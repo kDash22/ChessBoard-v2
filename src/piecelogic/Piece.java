@@ -138,7 +138,7 @@ public abstract class Piece {
         int row = chessRowToRow(getChessRow());
         int col = fileToCol(getFile());
 
-        Piece[][] refBoard = chessboardLogic.getChessboard();
+        Piece[][] refBoard = chessboardLogic.getChessboard().clone();
 
         for (int i = moveSet.size()-1 ; i >= 0; i--){
 
@@ -162,8 +162,6 @@ public abstract class Piece {
 
             //restore captured
             refBoard[ square[0] ][ square[1] ] = captured;
-
-            chessboardLogic.setChessboard(refBoard);
 
         }
 

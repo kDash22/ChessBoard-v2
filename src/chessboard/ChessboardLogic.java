@@ -185,6 +185,7 @@ public class ChessboardLogic {
                 chessboard[selectedRow][selectedCol] = null;
                 movingPiece.updateCoords(selectedToRow,selectedToCol);
                 setWhiteToMove(!whiteToMove);
+                checkGameOver();
             }
 
         }
@@ -238,5 +239,37 @@ public class ChessboardLogic {
         char col = Piece.colToFile(kingPos[1]);
 
         return isSquareAttacked(!isWhite,col,row);
+    }
+
+    public boolean checkGameOver(){
+
+        String colour = whiteToMove ? "White " : "Black ";
+        System.out.println("Checking if game over for "+colour+"! ");
+
+        int validMoveCount = 0;
+
+        for (int row = 0; row < 8; row++){
+            for (int col = 0; col < 8; col++){
+
+                if (chessboard[row][col] == null ) continue;
+
+                if (chessboard[row][col].isWhite() != whiteToMove) continue;
+
+                Piece piece = chessboard[row][col];
+                int moveCount = piece.getValidMoveSet().length;
+                System.out.print(moveCount);
+                validMoveCount = validMoveCount + moveCount;
+
+            }
+        }
+        System.out.println();
+
+        boolean isGameOver = validMoveCount == 0;
+        System.out.println("valid move count : "+validMoveCount);
+
+        String state = isGameOver ? "Game over ! " : "Not over ! ";
+        System.out.println(state+"\n");
+
+        return isGameOver;
     }
 }
