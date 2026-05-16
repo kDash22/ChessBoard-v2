@@ -4,6 +4,8 @@ import java.util.List;
 
 import piecelogic.*;
 
+import javax.swing.*;
+
 public class ChessboardLogic {
 
     protected ChessboardGui chessboardGui;
@@ -90,6 +92,7 @@ public class ChessboardLogic {
         insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, false), 'a', 7);
 
 
+
     }
 
     public static boolean isIndexWithinBounds(int row, int col){
@@ -160,6 +163,8 @@ public class ChessboardLogic {
                 chessboard[selectedRow][selectedCol] = null;
                 setWhiteToMove(!whiteToMove);
 
+                checkGameOver();
+
             }
 
         }
@@ -190,7 +195,9 @@ public class ChessboardLogic {
             }
             
         }
-        checkGameOver();
+
+
+
     }
 
     //a method to check if a square is attacked by a specified color
@@ -268,10 +275,10 @@ public class ChessboardLogic {
         }
     }
 
-    public boolean checkGameOver(){
+    public boolean hasNoLegalMoves(){
 
-        String colour = whiteToMove ? "White " : "Black ";
-        System.out.println("Checking if game over for "+colour+"! ");
+        //String colour = whiteToMove ? "White " : "Black ";
+        //System.out.println("Checking if game over for "+colour+"! ");
 
         int validMoveCount = 0;
 
@@ -285,20 +292,40 @@ public class ChessboardLogic {
                 Piece piece = chessboard[row][col];
                 piece.moveCheck(this,row,col);
                 int moveCount = piece.getValidMoveSet().length;
-                System.out.print(moveCount);
+                //System.out.print(moveCount+" ");
                 validMoveCount = validMoveCount + moveCount;
 
             }
         }
-        System.out.println();
+        //System.out.println();
 
-        boolean isGameOver = validMoveCount == 0;
-        System.out.println("valid move count : "+validMoveCount);
+        //System.out.println("valid move count : "+validMoveCount);
 
-        String state = isGameOver ? "Game over ! " : "Not over ! ";
-        System.out.println(state+"\n");
+        //String state = isGameOver ? "Game over ! " : "Not over ! ";
+        //System.out.println((validMoveCount == 0)+"\n");
 
-        return isGameOver;
+        return validMoveCount == 0;
+    }
+
+    public void checkGameOver(){
+        if (hasNoLegalMoves()) {
+
+            Piece[][] chessboard = getChessboard();
+            boolean turn = isWhiteToMove();
+
+            SwingUtilities.invokeLater(() -> {
+                if (isKingInCheck(turn, chessboard)) {
+                    String winner = turn ? "Black" : "White";
+                    System.out.println("CHECKMATE! " + winner + " wins!");
+                    JOptionPane.showMessageDialog(chessboardGui, "CHECKMATE! " + winner + " wins!");
+                } else {
+                    System.out.println("STALEMATE!");
+                    JOptionPane.showMessageDialog(chessboardGui, "STALEMATE! It's a draw.");
+                }
+            });
+
+        }
+
     }
 
     // a method used to convert column letter into int to be used in arrays

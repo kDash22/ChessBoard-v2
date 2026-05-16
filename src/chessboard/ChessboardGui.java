@@ -11,11 +11,8 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
-import global.Global;
 import piecelogic.*;
 
 public class ChessboardGui extends JPanel {
@@ -40,6 +37,10 @@ public class ChessboardGui extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e){
+
+                if (chessboardLogic.hasNoLegalMoves()){
+                    return; //disable mouse function
+                }
 
                 selectPiece(e);
 
@@ -356,7 +357,7 @@ public class ChessboardGui extends JPanel {
             g2d.setColor(new Color(255, 30, 30, 70));
             g2d.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
-    }       
+    }
 
     public static void main(String[] args){
 
