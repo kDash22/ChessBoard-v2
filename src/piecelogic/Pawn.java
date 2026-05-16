@@ -1,8 +1,11 @@
 package piecelogic;
 
 import chessboard.ChessboardLogic;
+import static global.Global.shallowCopyBoard;
 
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 public class Pawn extends Piece{
 
@@ -10,17 +13,12 @@ public class Pawn extends Piece{
     private boolean check = false;
     private boolean enPassantVulnerable = false;
 
-    public Pawn(char file, int chessRow, boolean isWhite ){
-        super(isWhite,PieceType.PAWN,file,chessRow);
-
-        setFile(file);
-        setChessRow(chessRow);
-
+    public Pawn(boolean isWhite) {
+        super(PieceType.PAWN, isWhite); 
     }
 
-
     @Override
-    public void moveCheck(ChessboardLogic chessboardLogic) {
+    public void moveCheck(ChessboardLogic chessboardLogic, int fromRow, int fromCol) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -30,35 +28,32 @@ public class Pawn extends Piece{
 
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
-        int col = fileToCol(getFile());
-        int row = chessRowToRow(getChessRow());
-
         //there are 4 general moves for a pawn
         // move 1 square forward, move 2 squares forward (only as the first move), take diagonally to the left and right
         //Pawns can only move forward, and it's different for the 2 teams
         int[][] tempMoves;
         if (isWhite()){
-            tempMoves = new int[][]{{row-1, col}, {row-2, col}, {row-1, col+1}, {row-1, col-1}};
+            tempMoves = new int[][]{{fromRow-1, fromCol}, {fromRow-2, fromCol}, {fromRow-1, fromCol+1}, {fromRow-1, fromCol-1}};
         } else {
-            tempMoves = new int[][]{{row+ 1, col}, {row+2, col}, {row+1, col+1}, {row+1,col -1}};
+            tempMoves = new int[][]{{fromRow+ 1, fromCol}, {fromRow+2, fromCol}, {fromRow+1, fromCol+1}, {fromRow+1,fromCol -1}};
         }
 
         //moving logic
-        if ( ChessboardLogic.isSquareWithinBounds( tempMoves[0][0],tempMoves[0][1] ) ){
+        if ( ChessboardLogic.isIndexWithinBounds( tempMoves[0][0],tempMoves[0][1] ) ){
 
             if (refBoard[tempMoves[0][0]][tempMoves[0][1]] == null) {//1 square check
                 moveSet.add(tempMoves[0]);
 
-                if (ChessboardLogic.isSquareWithinBounds( tempMoves[1][0],tempMoves[1][1] )){
+                if (ChessboardLogic.isIndexWithinBounds( tempMoves[1][0],tempMoves[1][1] )){
 
-                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !hasPawnMoved()) //2 square check
+                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !getHasMoved(fromRow)) //2 square check
                         moveSet.add(tempMoves[1]);
                 }
             }
         }
 
         //capturing logic to the right (observer's  right)
-        if ( ChessboardLogic.isSquareWithinBounds( tempMoves[2][0],tempMoves[2][1] ) ){
+        if ( ChessboardLogic.isIndexWithinBounds( tempMoves[2][0],tempMoves[2][1] ) ){
             int toRow = tempMoves[2][0];
             int toCol = tempMoves[2][1];
             if (       refBoard[toRow][toCol] != null
@@ -70,7 +65,7 @@ public class Pawn extends Piece{
         }
 
         //capturing logic to the left (observer's left)
-        if ( ChessboardLogic.isSquareWithinBounds( tempMoves[3][0],tempMoves[3][1] ) ){
+        if ( ChessboardLogic.isIndexWithinBounds( tempMoves[3][0],tempMoves[3][1] ) ){
             int toRow = tempMoves[3][0];
             int toCol = tempMoves[3][1];
             if (       refBoard[toRow][toCol] != null
@@ -84,26 +79,24 @@ public class Pawn extends Piece{
         //en passant logic start
         Piece pieceToTheLeft = null,pieceToTheRight = null;
 
-        if (ChessboardLogic.isSquareWithinBounds(row,col-1))
-            pieceToTheLeft = refBoard[row][col-1];
+        if (ChessboardLogic.isIndexWithinBounds(fromRow,fromCol-1))
+            pieceToTheLeft = refBoard[fromRow][fromCol-1];
 
-        if (ChessboardLogic.isSquareWithinBounds(row,col+1))
-            pieceToTheRight = refBoard[row][col+1];
+        if (ChessboardLogic.isIndexWithinBounds(fromRow,fromCol+1))
+            pieceToTheRight = refBoard[fromRow][fromCol+1];
 
-        if (pieceToTheLeft instanceof Pawn pawnToTheLeft && pawnToTheLeft.getEnPassantVulnerable()){
+        if (pieceToTheLeft instanceof Pawn pawnToTheLeft && pawnToTheLeft.getEnPassantVulnerable() && isWhite() != pawnToTheLeft.isWhite()){
             int dir = isWhite() ? -1 : 1;
-            int c = fileToCol(pawnToTheLeft.getFile());
-            moveSet.add(new int[]{row+dir,c});
+            moveSet.add(new int[]{fromRow+dir,fromCol-1});
         }
 
-        if (pieceToTheRight instanceof Pawn pawnToTheRight && pawnToTheRight.getEnPassantVulnerable()){
+        if (pieceToTheRight instanceof Pawn pawnToTheRight && pawnToTheRight.getEnPassantVulnerable() && isWhite() != pawnToTheRight.isWhite()){
             int dir = isWhite() ? -1 : 1;
-            int c = fileToCol(pawnToTheRight.getFile());
-            moveSet.add(new int[]{row+dir,c});
+            moveSet.add(new int[]{fromRow+dir,fromCol+1});
         }
         //en passant logic over
 
-        filterIllegalMoves(chessboardLogic,moveSet);
+        filterIllegalMoves(chessboardLogic,moveSet, fromRow, fromCol);
 
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
@@ -114,15 +107,12 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
-
-        int targetCol = fileToCol(targetFile);
-        int targetRow = chessRowToRow(targetChessRow);
+    public boolean attacksSquare(Piece[][] refBoard, int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
         int rowDir = isWhite() ? -1 : 1;
 
-        return (targetRow == chessRowToRow(getChessRow())+rowDir
-                && (targetCol == fileToCol(getFile()) - 1 || targetCol == fileToCol(getFile()) + 1)) ;
+        return (targetRow == pieceRow+rowDir
+                && (targetCol == pieceCol - 1 || targetCol == pieceCol + 1)) ;
 
     }
 
@@ -143,73 +133,90 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public void filterIllegalMoves(ChessboardLogic chessboardLogic, List<int[]> moveSet){
+    public void filterIllegalMoves(ChessboardLogic chessboardLogic, List<int[]> moveSet, int fromRow, int fromCol){
 
-        int row = chessRowToRow(getChessRow());
-        int col = fileToCol(getFile());
-
-        Piece[][] refBoard = chessboardLogic.getChessboard();
+        Piece[][] refBoard;
 
         for (int i = moveSet.size()-1 ; i >= 0; i--){
+
+            refBoard = shallowCopyBoard(chessboardLogic.getChessboard());
 
             int[] square = moveSet.get(i);
 
             Piece captured;
-            boolean enPassantHappened = false;
 
-            if (Math.abs(col - square[1]) == 1 && refBoard[ square[0] ][ square[1] ] == null ){
-                int dir = isWhite() ? 1 : -1;
-                captured = refBoard[square[0]+dir][square[1]] ;
+            if (Math.abs(fromCol - square[1]) == 1){
+                    if (refBoard[ square[0] ][ square[1] ] == null ) {
+                        
+                    int dir = isWhite() ? 1 : -1;
+                    captured = refBoard[square[0]+dir][square[1]] ;
 
-                if (!(captured instanceof Pawn)){
-                    throw new IllegalArgumentException("The captured Piece using EnPassant is not a Pawn at filterIllegalMoves in Pawn ! ");
+                    if (!(captured instanceof Pawn)){
+                        throw new IllegalArgumentException("The captured Piece using EnPassant is not a Pawn at filterIllegalMoves in Pawn ! ");
+                    }
+
+                    refBoard[square[0]+dir][square[1]] = null;
+
+                } else {
+                    captured = refBoard[ square[0] ][ square[1] ];
                 }
-
-                refBoard[square[0]+dir][square[1]] = null;
-                enPassantHappened = true;
-
-            } else {
-                captured = refBoard[ square[0] ][ square[1] ];
             }
 
+            refBoard[ square[0] ][ square[1] ] = refBoard[fromRow][fromCol];
+            refBoard[fromRow][fromCol] = null;
 
-            refBoard[ square[0] ][ square[1] ] = refBoard[row][col];
-            updateCoords(square[0],square[1]);
-            refBoard[row][col] = null;
-
-            chessboardLogic.setChessboard(refBoard);
-
-            if ( chessboardLogic.isKingInCheck(isWhite()) ){
+            if ( chessboardLogic.isKingInCheck(isWhite(),refBoard) ){
                 moveSet.remove(i);
             }
-
-            //undo move
-            // restore moving piece
-            refBoard[row][col] = refBoard[ square[0] ][ square[1] ];
-            updateCoords(row,col);
-
-            //restore captured
-            if (enPassantHappened){
-                int dir = isWhite() ? 1 : -1;
-                refBoard[square[0]+dir][square[1]] = captured ;
-                refBoard[ square[0] ][ square[1] ] = null;
-            } else {
-                refBoard[ square[0] ][ square[1] ] = captured;
-            }
-
-            chessboardLogic.setChessboard(refBoard);
 
         }
 
     }
 
-    public boolean hasPawnMoved(){
-        return originalChessRow != getChessRow() || originalFile != getFile();
+    public Piece promote(ChessboardLogic chessboardLogic){
+
+        Piece newPiece;
+
+        String[] options = { //promotion options
+                    "Knight",
+                    "Bishop",
+                    "Rook",
+                    "Queen",
+        };
+
+        int choice = JOptionPane.showOptionDialog(//the message box to choose which promotion happens
+                null,                    
+                "Choose the promotion:",
+                "Promotion",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[3]//default is queen
+        );
+        
+
+        switch (choice){ //the promotions
+            case 0 -> newPiece = PieceFactory.createPiece(PieceType.KNIGHT, isWhite());
+            case 1 -> newPiece = PieceFactory.createPiece(PieceType.BISHOP, isWhite());
+            case 2 -> newPiece = PieceFactory.createPiece(PieceType.ROOK, isWhite());
+            case 3 -> newPiece = PieceFactory.createPiece(PieceType.QUEEN, isWhite());
+            default -> newPiece = PieceFactory.createPiece(PieceType.QUEEN, isWhite());
+        }        
+
+        return newPiece;    
+    }  
+
+    public boolean getHasMoved(int fromRow){
+
+        int startingRow = isWhite() ? 6 : 1;
+
+        return fromRow != startingRow;
     }
 
     public String toString(){
-        String tag = isWhite() ? "White Pawn at " : "Black Pawn at ";
-        tag += getFile()+""+getChessRow();
+        String tag = isWhite() ? "White Pawn" : "Black Pawn";
+        //tag += getFile()+""+getChessRow();
         return tag;
     }
 

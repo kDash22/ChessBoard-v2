@@ -5,18 +5,13 @@ import chessboard.ChessboardLogic;
 public class Knight extends Piece {
 
     public static final int PIECE_VALUE = 3;
-    private boolean check = false;
 
-    public Knight(char file, int chessRow, boolean isWhite){
-        super(isWhite,PieceType.KNIGHT,file,chessRow);
-        setFile(file);
-        setChessRow(chessRow);
-
-
+    public Knight(boolean isWhite) {
+        super(PieceType.KNIGHT, isWhite);
     }
 
     @Override
-    public void moveCheck(ChessboardLogic chessboardLogic) {
+    public void moveCheck(ChessboardLogic chessboardLogic, int fromRow, int fromCol) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -29,20 +24,17 @@ public class Knight extends Piece {
         //a knight has 8 possible moves or directions
         int[][] directions = {{2,1},{1,2},{-1,2},{-2,1},{-2,-1},{-1,-2},{1,-2},{2,-1}};
 
-        int col = fileToCol(getFile());
-        int row = chessRowToRow(getChessRow());
-
         for (int i = 0; i < 8; i++){
-                int toRow = row + directions[i][0];
-                int toCol = col + directions[i][1];
+                int toRow = fromRow + directions[i][0];
+                int toCol = fromCol + directions[i][1];
 
-                if( ChessboardLogic.isSquareWithinBounds(toRow,toCol) ){
+                if( ChessboardLogic.isIndexWithinBounds(toRow,toCol) ){
 
                     if (refBoard[toRow][toCol] == null){
                         moveSet.add(new int[]{toRow, toCol});
 
                     } else if (refBoard[toRow][toCol].isWhite() != isWhite() && refBoard[toRow][toCol].isKing()) {
-                        check = true;//find the best way to implement this feature
+                        break;
 
                     } else if(refBoard[toRow][toCol].isWhite() != isWhite()) {
                         moveSet.add(new int[]{toRow, toCol});
@@ -53,7 +45,7 @@ public class Knight extends Piece {
 
         }
 
-        filterIllegalMoves(chessboardLogic,moveSet);
+        filterIllegalMoves(chessboardLogic,moveSet, fromRow, fromCol);
 
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
@@ -65,19 +57,16 @@ public class Knight extends Piece {
     }
 
     public String toString(){
-        String tag = isWhite() ? "White Knight at " : "Black Knight at ";
-        tag += getFile()+""+getChessRow();
+        String tag = isWhite() ? "White Knight" : "Black Knight";
+        //tag += getFile()+""+getChessRow();
         return tag;
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+    public boolean attacksSquare(Piece[][] refBoard, int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
-        int targetCol = fileToCol(targetFile);
-        int targetRow = chessRowToRow(targetChessRow);
-
-        int rowDiff = Math.abs(targetRow - chessRowToRow(getChessRow()));
-        int colDiff = Math.abs(targetCol - fileToCol(getFile()));
+        int rowDiff = Math.abs(targetRow - pieceRow);
+        int colDiff = Math.abs(targetCol - pieceCol);
 
         return ((rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2));
     }

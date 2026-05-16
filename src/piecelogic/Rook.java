@@ -5,20 +5,15 @@ import chessboard.ChessboardLogic;
 public class Rook extends Piece{
 
     public static final int PIECE_VALUE = 5;
-    private boolean check = false;
 
     private boolean hasMoved = false;
 
-    public Rook(char file, int chessRow, boolean isWhite){
-        super(isWhite,PieceType.ROOK,file,chessRow);
-
-        setFile(file);
-        setChessRow(chessRow);
-
+    public Rook(boolean isWhite) {
+        super(PieceType.ROOK, isWhite);
     }
 
     @Override
-    public void moveCheck(ChessboardLogic chessboardLogic) {
+    public void moveCheck(ChessboardLogic chessboardLogic, int fromRow, int fromCol) {
         moveSet.clear();//clear the list to remove earlier move
 
         if (isWhite() != chessboardLogic.isWhiteToMove()){
@@ -31,20 +26,16 @@ public class Rook extends Piece{
         //a Rook can move in 4 directions
         int[][] directions = {{1,0},{0,1},{-1,0},{0,-1}};
 
-        int col = fileToCol(getFile());
-        int row = chessRowToRow(getChessRow());
-
         for (int[] direction : directions){
-            int toRow = row + direction[0];
-            int toCol = col + direction[1];
+            int toRow = fromRow + direction[0];
+            int toCol = fromCol + direction[1];
 
-            while( ChessboardLogic.isSquareWithinBounds(toRow,toCol) ){
+            while( ChessboardLogic.isIndexWithinBounds(toRow,toCol) ){
 
                 if (refBoard[toRow][toCol] == null){
                     moveSet.add(new int[]{toRow, toCol});
 
                 } else if (refBoard[toRow][toCol].isWhite() != isWhite() && refBoard[toRow][toCol].isKing()) {
-                    check = true;//find the best way to implement this feature
                     break;
                 } else if(refBoard[toRow][toCol].isWhite() != isWhite()) {
                     moveSet.add(new int[]{toRow, toCol});
@@ -58,7 +49,7 @@ public class Rook extends Piece{
             }
         }
 
-        filterIllegalMoves(chessboardLogic,moveSet);
+        filterIllegalMoves(chessboardLogic,moveSet, fromRow, fromCol);
 
         int validMoveCount = moveSet.size();
         validMoveSet = new int[validMoveCount][2];
@@ -69,26 +60,20 @@ public class Rook extends Piece{
     }
 
     @Override
-    public boolean attacksSquare(ChessboardLogic chessboardLogic,char targetFile, int targetChessRow) {
+    public boolean attacksSquare(Piece[][] refBoard, int pieceRow, int pieceCol, int targetRow, int targetCol) {
 
-        int targetCol = fileToCol(targetFile);
-        int targetRow = chessRowToRow(targetChessRow);
-
-        int row = chessRowToRow(getChessRow());
-        int col = fileToCol(getFile());
-
-        if (targetRow != row && targetCol != col)
+        if (targetRow != pieceRow && targetCol != pieceCol)
             return false;
 
-        int rowDir = Integer.compare(targetRow,row);
-        int colDir = Integer.compare(targetCol,col);
+        int rowDir = Integer.compare(targetRow,pieceRow);
+        int colDir = Integer.compare(targetCol,pieceCol);
 
-        int r = row+rowDir;
-        int c = col+colDir;
+         int r = pieceRow + rowDir;
+         int c = pieceCol + colDir;
 
         while (targetCol != c || targetRow != r){
 
-            if (chessboardLogic.getChessboard()[r][c] != null){
+            if (refBoard[r][c] != null){
                 return false;
 
             }
@@ -109,8 +94,8 @@ public class Rook extends Piece{
     }
 
     public String toString(){
-        String tag = isWhite() ? "White Rook at " : "Black Rook at ";
-        tag += getFile()+""+getChessRow();
+        String tag = isWhite() ? "White Rook" : "Black Rook";
+        //tag += getFile()+""+getChessRow();
         return tag;
     }
 }

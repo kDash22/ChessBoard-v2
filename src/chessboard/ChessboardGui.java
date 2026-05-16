@@ -144,6 +144,9 @@ public class ChessboardGui extends JPanel {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece piece = chessboardLogic.chessboard[row][col];
+
+                if (piece == null) continue;
+
                 Image pieceIcon = getPieceImage(piece);
 
                 if (pieceIcon != null) {
@@ -165,7 +168,7 @@ public class ChessboardGui extends JPanel {
         if (selectedRow != -1 && selectedCol != -1) {
             Piece selected = chessboardLogic.chessboard[selectedRow][selectedCol];
             if (selected != null) {
-                highlightSquare(g2d, selected);
+                highlightSquare(g2d, selected, selectedRow , selectedCol);
 
                 g2d.setColor(new Color(148,224,224,90));
                 g2d.fillRect(selectedCol * TILE_SIZE, selectedRow * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -217,17 +220,6 @@ public class ChessboardGui extends JPanel {
             return;
         }
 
-        /*
-        int chessRow = Piece.rowToChessRow(row);
-        char file = Piece.colToFile(col);
-
-        System.out.println("Is "+file+chessRow+" attacked : "+chessboardLogic.isSquareAttacked(true,file,chessRow));
-        int[] kingPos = chessboardLogic.getKingPos(true);
-
-        System.out.println("\nwhite king pos"+Piece.colToFile(kingPos[1])+Piece.rowToChessRow(kingPos[0]));
-
-         */
-
         Piece[][] refBoard = chessboardLogic.getChessboard();
 
         //if a piece is already selected
@@ -246,6 +238,7 @@ public class ChessboardGui extends JPanel {
                     return;
                 }
 
+                //switch piece
                 if (refBoard[row][col].isWhite() == refBoard[selectedRow][selectedCol].isWhite()){
                     selectedRow = row;
                     selectedCol = col;
@@ -322,14 +315,15 @@ public class ChessboardGui extends JPanel {
 
     }
 
-    public void highlightSquare(Graphics2D g2d, Piece piece){
+    //this must only run after a selection is made, otherwise it will throw a null pointer exception
+    public void highlightSquare(Graphics2D g2d, Piece piece, int selectedRow, int selectedCol){
 
         if (piece == null) return;
 
-        //check on this
-        piece.moveCheck(chessboardLogic);
+        if (!pieceSelected) return;
+
+        piece.moveCheck(chessboardLogic,selectedRow,selectedCol);
         int[][] moveSet = piece.getValidMoveSet();
-        Global.printValidMoveSet(moveSet);
 
         for (int[] move : moveSet) {
             int row = move[0];
@@ -352,26 +346,31 @@ public class ChessboardGui extends JPanel {
     private void highlightCheckedKing(Graphics2D g2d){
 
         boolean whiteToMove = chessboardLogic.isWhiteToMove();
+        Piece[][] refBoard = chessboardLogic.getChessboard();
 
-        if (chessboardLogic.isKingInCheck(whiteToMove)){
-            int[] kingPos = chessboardLogic.getKingPos(whiteToMove);
+        if (chessboardLogic.isKingInCheck(whiteToMove, refBoard)){
+            int[] kingPos = chessboardLogic.getKingPos(whiteToMove, refBoard);
             int row = kingPos[0];
             int col = kingPos[1];
 
             g2d.setColor(new Color(255, 30, 30, 70));
             g2d.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
-    }
+    }       
 
     public static void main(String[] args){
 
-        ChessboardLogic chessboardLogic = new ChessboardLogic();
-        chessboardLogic.newGame();
-        //chessboardLogic.customBoard(); // used for testing and debugging
-        chessboardLogic.getChessboardGui().showGame();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            ChessboardLogic chessboardLogic = new ChessboardLogic();
+            //chessboardLogic.newGame();
+            chessboardLogic.customBoard();
+            chessboardLogic.getChessboardGui().showGame();
+        });
+
         System.out.println();
         System.out.println();
 
+        /*
         for (int row = 0; row < 8; row++){
             for (int col = 0; col < 8; col++){
                 Piece piece = chessboardLogic.chessboard[row][col];
@@ -382,6 +381,7 @@ public class ChessboardGui extends JPanel {
                 }
             }
         }
+            */
     }
 
 }
