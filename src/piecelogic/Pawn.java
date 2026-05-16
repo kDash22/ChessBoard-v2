@@ -1,6 +1,7 @@
 package piecelogic;
 
 import chessboard.ChessboardLogic;
+import static global.Global.copyBoard;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class Pawn extends Piece{
 
                 if (ChessboardLogic.isIndexWithinBounds( tempMoves[1][0],tempMoves[1][1] )){
 
-                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !getHasMoved()) //2 square check
+                    if (refBoard[tempMoves[1][0]][tempMoves[1][1]] == null && !getHasMoved(fromRow)) //2 square check
                         moveSet.add(tempMoves[1]);
                 }
             }
@@ -135,54 +136,39 @@ public class Pawn extends Piece{
     @Override
     public void filterIllegalMoves(ChessboardLogic chessboardLogic, List<int[]> moveSet, int fromRow, int fromCol){
 
-        Piece[][] refBoard = chessboardLogic.getChessboard();
+        Piece[][] refBoard;
 
         for (int i = moveSet.size()-1 ; i >= 0; i--){
+
+            refBoard = copyBoard(chessboardLogic.getChessboard());
 
             int[] square = moveSet.get(i);
 
             Piece captured;
-            boolean enPassantHappened = false;
 
-            if (Math.abs(fromCol - square[1]) == 1 && refBoard[ square[0] ][ square[1] ] == null ){
-                int dir = isWhite() ? 1 : -1;
-                captured = refBoard[square[0]+dir][square[1]] ;
+            if (Math.abs(fromCol - square[1]) == 1){
+                    if (refBoard[ square[0] ][ square[1] ] == null ) {
+                        
+                    int dir = isWhite() ? 1 : -1;
+                    captured = refBoard[square[0]+dir][square[1]] ;
 
-                if (!(captured instanceof Pawn)){
-                    throw new IllegalArgumentException("The captured Piece using EnPassant is not a Pawn at filterIllegalMoves in Pawn ! ");
+                    if (!(captured instanceof Pawn)){
+                        throw new IllegalArgumentException("The captured Piece using EnPassant is not a Pawn at filterIllegalMoves in Pawn ! ");
+                    }
+
+                    refBoard[square[0]+dir][square[1]] = null;
+
+                } else {
+                    captured = refBoard[ square[0] ][ square[1] ];
                 }
-
-                refBoard[square[0]+dir][square[1]] = null;
-                enPassantHappened = true;
-
-            } else {
-                captured = refBoard[ square[0] ][ square[1] ];
             }
-
 
             refBoard[ square[0] ][ square[1] ] = refBoard[fromRow][fromCol];
             refBoard[fromRow][fromCol] = null;
 
-            chessboardLogic.setChessboard(refBoard);
-
             if ( chessboardLogic.isKingInCheck(isWhite(),refBoard) ){
                 moveSet.remove(i);
             }
-
-            //undo move
-            // restore moving piece
-            refBoard[fromRow][fromCol] = refBoard[ square[0] ][ square[1] ];
-
-            //restore captured
-            if (enPassantHappened){
-                int dir = isWhite() ? 1 : -1;
-                refBoard[square[0]+dir][square[1]] = captured ;
-                refBoard[ square[0] ][ square[1] ] = null;
-            } else {
-                refBoard[ square[0] ][ square[1] ] = captured;
-            }
-
-            chessboardLogic.setChessboard(refBoard);
 
         }
 
@@ -220,14 +206,15 @@ public class Pawn extends Piece{
         }        
 
         return newPiece;    
-    }
+    }  
 
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
-    }   
+    public boolean getHasMoved(int fromRow){
 
-    public boolean getHasMoved(){
-        return hasMoved; 
+        int startingRow = isWhite() ? 6 : 1;
+        if (fromRow != startingRow){
+            return true;
+        } 
+        return false;
     }
 
     public String toString(){

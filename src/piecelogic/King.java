@@ -4,8 +4,6 @@ import chessboard.ChessboardLogic;
 
 public class King extends Piece{
 
-    private boolean check = false;
-
     private boolean hasMoved = false;
 
     public King(boolean isWhite) {

@@ -11,8 +11,6 @@ public class ChessboardLogic {
     private boolean whiteToMove ;
 
     protected Piece[][] chessboard = new Piece[8][8];//logical representation of the 8 x 8 board
-
-    private int wKingRow,wKingCol,bKingRow,bKingCol;
     
     public static final List<Character> COLUMN_LETTERS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
 
@@ -53,16 +51,6 @@ public class ChessboardLogic {
         int row = chessRowToRow(chessRow);
 
         this.chessboard[row][col] = piece;
-
-        if (piece instanceof King king ) {
-            if (king.isWhite()) {
-                wKingRow = row;
-                wKingCol = col;
-            } else {
-                bKingRow = row;
-                bKingCol = col;
-            }
-        }
         //System.out.println("piece inserted into the board ! ");
     }
 
@@ -98,7 +86,8 @@ public class ChessboardLogic {
         insertPieceToBoard(PieceFactory.createPiece(PieceType.KNIGHT,false),'e',4);
         insertPieceToBoard(PieceFactory.createPiece(PieceType.BISHOP,false),'e',5);
         insertPieceToBoard(PieceFactory.createPiece(PieceType.QUEEN,true),'d',7);
-        insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, true), 'a', 7);
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, true), 'a', 2);
+        insertPieceToBoard(PieceFactory.createPiece(PieceType.PAWN, false), 'a', 7);
 
 
     }
@@ -169,7 +158,7 @@ public class ChessboardLogic {
                 chessboard[selectedToRow][selectedToCol] = movingPiece;
                 chessboard[selectedRow][selectedCol] = null;
                 setWhiteToMove(!whiteToMove);
-                checkGameOver();
+
             }
 
         }
@@ -183,21 +172,10 @@ public class ChessboardLogic {
             if (!king.getHasMoved()) {
                 king.setHasMoved(true);
             }
-                
-            if (king.isWhite()) {
-                wKingCol = selectedToCol;
-                wKingRow = selectedToRow;
-            } else {
-                bKingCol = selectedToCol;
-                bKingRow = selectedToRow;
-            }
+
         }
 
         if (movingPiece instanceof Pawn pawn) {
-
-            if (!pawn.getHasMoved()) {
-                pawn.setHasMoved(true);
-            }
 
             int endRow = pawn.isWhite() ? 0 : 7;
 
@@ -211,6 +189,7 @@ public class ChessboardLogic {
             }
             
         }
+        checkGameOver();
     }
 
     //a method to check if a square is attacked by a specified color

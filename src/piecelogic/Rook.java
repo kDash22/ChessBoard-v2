@@ -5,7 +5,6 @@ import chessboard.ChessboardLogic;
 public class Rook extends Piece{
 
     public static final int PIECE_VALUE = 5;
-    private boolean check = false;
 
     private boolean hasMoved = false;
 
@@ -37,7 +36,6 @@ public class Rook extends Piece{
                     moveSet.add(new int[]{toRow, toCol});
 
                 } else if (refBoard[toRow][toCol].isWhite() != isWhite() && refBoard[toRow][toCol].isKing()) {
-                    check = true;//find the best way to implement this feature
                     break;
                 } else if(refBoard[toRow][toCol].isWhite() != isWhite()) {
                     moveSet.add(new int[]{toRow, toCol});

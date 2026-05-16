@@ -14,7 +14,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JOptionPane;
 
 import global.Global;
 import piecelogic.*;
