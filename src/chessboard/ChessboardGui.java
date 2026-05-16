@@ -324,7 +324,6 @@ public class ChessboardGui extends JPanel {
 
         piece.moveCheck(chessboardLogic,selectedRow,selectedCol);
         int[][] moveSet = piece.getValidMoveSet();
-        Global.printValidMoveSet(moveSet);
 
         for (int[] move : moveSet) {
             int row = move[0];

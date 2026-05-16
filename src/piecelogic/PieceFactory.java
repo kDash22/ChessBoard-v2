@@ -1,7 +1,5 @@
 package piecelogic;
 
-import chessboard.ChessboardLogic;
-
 public class PieceFactory {
 
     public static Piece createPiece(PieceType pieceType, boolean isWhite){

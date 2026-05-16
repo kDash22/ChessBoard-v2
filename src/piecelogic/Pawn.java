@@ -12,7 +12,6 @@ public class Pawn extends Piece{
     public static final int PIECE_VALUE = 1;
     private boolean check = false;
     private boolean enPassantVulnerable = false;
-    private boolean hasMoved = false;   
 
     public Pawn(boolean isWhite) {
         super(PieceType.PAWN, isWhite); 
@@ -86,12 +85,12 @@ public class Pawn extends Piece{
         if (ChessboardLogic.isIndexWithinBounds(fromRow,fromCol+1))
             pieceToTheRight = refBoard[fromRow][fromCol+1];
 
-        if (pieceToTheLeft instanceof Pawn pawnToTheLeft && pawnToTheLeft.getEnPassantVulnerable()){
+        if (pieceToTheLeft instanceof Pawn pawnToTheLeft && pawnToTheLeft.getEnPassantVulnerable() && isWhite() != pawnToTheLeft.isWhite()){
             int dir = isWhite() ? -1 : 1;
             moveSet.add(new int[]{fromRow+dir,fromCol-1});
         }
 
-        if (pieceToTheRight instanceof Pawn pawnToTheRight && pawnToTheRight.getEnPassantVulnerable()){
+        if (pieceToTheRight instanceof Pawn pawnToTheRight && pawnToTheRight.getEnPassantVulnerable() && isWhite() != pawnToTheRight.isWhite()){
             int dir = isWhite() ? -1 : 1;
             moveSet.add(new int[]{fromRow+dir,fromCol+1});
         }
@@ -211,10 +210,8 @@ public class Pawn extends Piece{
     public boolean getHasMoved(int fromRow){
 
         int startingRow = isWhite() ? 6 : 1;
-        if (fromRow != startingRow){
-            return true;
-        } 
-        return false;
+
+        return fromRow != startingRow;
     }
 
     public String toString(){

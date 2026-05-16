@@ -148,7 +148,8 @@ public class ChessboardLogic {
                         pieceToTheRight = chessboard[selectedToRow][selectedToCol+1];
 
 
-                    if (pieceToTheLeft instanceof Pawn || pieceToTheRight instanceof Pawn){
+                    if ((pieceToTheLeft instanceof Pawn && pieceToTheLeft.isWhite() != whiteToMove)
+                            || (pieceToTheRight instanceof Pawn && pieceToTheRight.isWhite() != whiteToMove)){
                         pawn.setEnPassantVulnerable(true);
                         immediateAction = true;
                     }
