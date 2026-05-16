@@ -2,7 +2,7 @@ package piecelogic;
 
 import chessboard.ChessboardLogic;
 
-import static global.Global.copyBoard;
+import static global.Global.shallowCopyBoard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public abstract class Piece {
 
         for (int i = moveSet.size()-1 ; i >= 0; i--){
 
-            refBoard = copyBoard(chessboardLogic.getChessboard());
+            refBoard = shallowCopyBoard(chessboardLogic.getChessboard());
 
             int[] square = moveSet.get(i);
 

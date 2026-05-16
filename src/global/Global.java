@@ -65,11 +65,11 @@ public class Global {
         System.out.println();
     }
 
-    public static Piece[][] copyBoard(Piece[][] board) {
+    public static Piece[][] shallowCopyBoard(Piece[][] board) {
         Piece[][] copy = new Piece[8][8];
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
-                copy[r][c] = board[r][c]; // shallow piece ref is OK if immutable
+                copy[r][c] = board[r][c];// intentional shallow copy; callers must not mutate shared Piece state through the copy
             }
         }
         return copy;
